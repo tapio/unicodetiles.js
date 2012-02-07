@@ -7,10 +7,10 @@
 
 .unicodetiles {
 	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
-	font-size: 20px;
 	white-space: pre;
 	text-align: center;
 	line-height: 1;
 	letter-spacing: 0px;
+	display: inline-block;
 	overflow: hidden;
 }

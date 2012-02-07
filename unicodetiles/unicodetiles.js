@@ -37,7 +37,7 @@ var UT = {
 	},
 
 
-	Window: function (elem, w, h, font_size) {
+	Window: function (elem, w, h) {
 		this.elem = elem;
 		this.w = w;
 		this.h = h;
@@ -47,12 +47,8 @@ var UT = {
 		// Add CSS class if not added already
 		if (elem.className.indexOf(UT.CSSCLASS) == -1) {
 			if (elem.className.length == 0) elem.className = UT.CSSCLASS;
-			else elem.className += " " + UT.CLASSNAME;
+			else elem.className += " " + UT.CSSCLASS;
 		}
-
-		// Modify font size if needed
-		if (font_size)
-			this.elem.style.fontSize = font_size + "px"
 
 		this.buffer = new Array(h);
 		for (var j = 0; j < h; ++j)
