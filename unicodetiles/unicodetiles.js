@@ -1,9 +1,28 @@
 
+/// Namespace: UT
+/// The tile engine classses etc. are wrapped inside this.
 var UT = {
 
+	/// Constants: Unicodetiles constants
+	/// NULLCHAR - Character used when none is specified otherwise.
+	/// CSSCLASS - The CSS class name used for the tile engine element.
 	NULLCHAR: " ",
 	CSSCLASS: "unicodetiles",
 
+	/// Class: Tile
+	/// Represents a unicode character tile with various attributes.
+
+	/// Constructor: Tile
+	/// Constructs a new Tile object.
+	///
+	/// Parameters:
+	///   char - a character to display for this tile
+	///   r - (optional) red color component
+	///   g - (optional) green color component
+	///   b - (optional) blue color component
+	///   br - (optional) red background color component
+	///   bg - (optional) green background color component
+	///   bb - (optional) blue background color component
 	Tile: function (char, r, g, b, br, bg, bb) {
 		this.char = char || UT.NULLCHAR;
 		this.r = r; 
@@ -13,6 +32,11 @@ var UT = {
 		this.bg = bg;
 		this.bb = bb;
 
+		/// Function: html
+		/// Composes and returns the html representation of the tile.
+		///
+		/// Returns:
+		/// The html representation of the tile.
 		this.html = function() {
 			// Check if we have foreground / background colors
 			var fc = (this.r != undefined && this.g != undefined && this.b != undefined);
@@ -37,6 +61,16 @@ var UT = {
 	},
 
 
+	/// Class: Window
+	/// The tile engine viewport / container / "the thing".
+
+	/// Constructor: Window
+	/// Constructs a new Window object.
+	///
+	/// Parameters:
+	///   elem - the DOM element which shall be transformed into the tile engine
+	///   w - width in tiles
+	///   h - height in tiles
 	Window: function (elem, w, h) {
 		this.elem = elem;
 		this.w = w;
