@@ -57,10 +57,12 @@
 		}
 
 		function handleKeys() {
+			var oldx = pl.x, oldy = pl.y;
 			if (pressedKeys[KEY_LEFT])  pl.x--;
 			if (pressedKeys[KEY_RIGHT]) pl.x++;
 			if (pressedKeys[KEY_UP])    pl.y--;
 			if (pressedKeys[KEY_DOWN])  pl.y++;
+			if (getDungeonTile(pl.x, pl.y).getChar() === '#') { pl.x = oldx; pl.y = oldy; }
 		}
 
 		function tick() {

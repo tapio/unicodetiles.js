@@ -27,6 +27,7 @@ var UT = {
 			return ret;
 		}
 
+		this.getChar = function() { return this.char; }
 		this.setChar = function(char) { this.char = char; }
 		this.setColor = function(r, g, b) { this.r = r; this.g = g; this.b = b; }
 		this.setGrey = function(grey) { this.r = grey; this.g = grey; this.b = grey; }
@@ -62,6 +63,13 @@ var UT = {
 			y = Math.round(y);
 			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
 			this.buffer[y][x] = tile;
+		}
+
+		this.get = function(x, y) {
+			x = Math.round(x);
+			y = Math.round(y);
+			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
+			return this.buffer[y][x];
 		}
 
 		this.proceduralFill = function(func, offsetx, offsety) {
