@@ -16,16 +16,16 @@ var UT = {
 	/// Constructs a new Tile object.
 	///
 	/// Parameters:
-	///   char - a character to display for this tile
+	///   ch - a character to display for this tile
 	///   r - (optional) red color component
 	///   g - (optional) green color component
 	///   b - (optional) blue color component
 	///   br - (optional) red background color component
 	///   bg - (optional) green background color component
 	///   bb - (optional) blue background color component
-	Tile: function(char, r, g, b, br, bg, bb) {
+	Tile: function(ch, r, g, b, br, bg, bb) {
 		"use strict";
-		this.char = char || UT.NULLCHAR;
+		this.ch = ch || UT.NULLCHAR;
 		this.r = r; 
 		this.g = g;
 		this.b = b;
@@ -43,22 +43,22 @@ var UT = {
 			var fc = (this.r !== undefined && this.g !== undefined && this.b !== undefined);
 			var bc = (this.br !== undefined && this.bg !== undefined && this.bb !== undefined);
 			// If no coloring, just return the char
-			if (!fc && !bc) return this.char;
+			if (!fc && !bc) return this.ch;
 			// Inline CSS for coloring
 			var ret = '<span style="';
 			if (fc) ret += 'color:rgb('+this.r+','+this.g+','+this.b+');';
 			if (bc) ret += 'background-color:rgb('+this.br+','+this.bg+','+this.bb+');';
-			ret += '">' + this.char + '</span>';
+			ret += '">' + this.ch + '</span>';
 			return ret;
 		};
 
-		this.getChar = function() { return this.char; };
-		this.setChar = function(char) { this.char = char; };
+		this.getChar = function() { return this.ch; };
+		this.setChar = function(ch) { this.ch = ch; };
 		this.setColor = function(r, g, b) { this.r = r; this.g = g; this.b = b; };
 		this.setGrey = function(grey) { this.r = grey; this.g = grey; this.b = grey; };
 		this.setBackground = function(r, g, b) { this.br = r; this.bg = g; this.bb = b; };
-		this.resetColor = function() { this.r = undefined; this.g = undefined; this.b = undefined; };
-		this.resetBackground = function() { this.br = undefined; this.bg = undefined; this.bb = undefined; };
+		this.resetColor = function() { this.r = this.g = this.b = undefined; };
+		this.resetBackground = function() { this.br = this.bg = this.bb = undefined; };
 	},
 
 
@@ -112,10 +112,10 @@ var UT = {
 					this.buffer[j][i] = func(i+offsetx, j+offsety);
 		};
 
-		this.clear = function(char) {
+		this.clear = function(ch) {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
-					this.buffer[j][i] = new UT.Tile(char);
+					this.buffer[j][i] = new UT.Tile(ch);
 		};
 
 		this.render = function() {
