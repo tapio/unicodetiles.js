@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Minimal Example</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript">
+		var term; // Can't be initialized yet because DOM is not ready
+
+		// Returns a random tile
+		function randomTile(x, y) {
+			var r = Math.floor(Math.random() * 255);
+			var g = Math.floor(Math.random() * 255);
+			var b = Math.floor(Math.random() * 255);
+			return new UT.Tile('#', r, g, b);
+		}
+
+		// Called after HTML is loaded, initializes UnicodeTiles etc.
+		function start() {
+			term = new UT.Window(document.getElementById("game"), 51, 25);
+			window.setInterval("tick()", 250);
+		}
+
+		// Called every now and then to update the screen
+		function tick() {
+			term.proceduralFill(randomTile, 0, 0);
+			term.render();
+		}
+	</script> 
+</head>
+
+<body onload="start();"><div id="container">
+
+	<div class="centerer">
+		<div id="game"></div>
+	</div>
+
+</div></body>
+</html>
