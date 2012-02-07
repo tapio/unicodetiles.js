@@ -23,7 +23,8 @@ var UT = {
 	///   br - (optional) red background color component
 	///   bg - (optional) green background color component
 	///   bb - (optional) blue background color component
-	Tile: function (char, r, g, b, br, bg, bb) {
+	Tile: function(char, r, g, b, br, bg, bb) {
+		"use strict";
 		this.char = char || UT.NULLCHAR;
 		this.r = r; 
 		this.g = g;
@@ -39,25 +40,25 @@ var UT = {
 		/// The html representation of the tile.
 		this.html = function() {
 			// Check if we have foreground / background colors
-			var fc = (this.r != undefined && this.g != undefined && this.b != undefined);
-			var bc = (this.br != undefined && this.bg != undefined && this.bb != undefined);
+			var fc = (this.r !== undefined && this.g !== undefined && this.b !== undefined);
+			var bc = (this.br !== undefined && this.bg !== undefined && this.bb !== undefined);
 			// If no coloring, just return the char
 			if (!fc && !bc) return this.char;
 			// Inline CSS for coloring
-			ret = '<span style="';
+			var ret = '<span style="';
 			if (fc) ret += 'color:rgb('+this.r+','+this.g+','+this.b+');';
 			if (bc) ret += 'background-color:rgb('+this.br+','+this.bg+','+this.bb+');';
 			ret += '">' + this.char + '</span>';
 			return ret;
-		}
+		};
 
-		this.getChar = function() { return this.char; }
-		this.setChar = function(char) { this.char = char; }
-		this.setColor = function(r, g, b) { this.r = r; this.g = g; this.b = b; }
-		this.setGrey = function(grey) { this.r = grey; this.g = grey; this.b = grey; }
-		this.setBackground = function(r, g, b) { this.br = r; this.bg = g; this.bb = b; }
-		this.resetColor = function() { this.r = undefined; this.g = undefined; this.b = undefined; }
-		this.resetBackground = function() { this.br = undefined; this.bg = undefined; this.bb = undefined; }
+		this.getChar = function() { return this.char; };
+		this.setChar = function(char) { this.char = char; };
+		this.setColor = function(r, g, b) { this.r = r; this.g = g; this.b = b; };
+		this.setGrey = function(grey) { this.r = grey; this.g = grey; this.b = grey; };
+		this.setBackground = function(r, g, b) { this.br = r; this.bg = g; this.bb = b; };
+		this.resetColor = function() { this.r = undefined; this.g = undefined; this.b = undefined; };
+		this.resetBackground = function() { this.br = undefined; this.bg = undefined; this.bb = undefined; };
 	},
 
 
@@ -71,7 +72,8 @@ var UT = {
 	///   elem - the DOM element which shall be transformed into the tile engine
 	///   w - width in tiles
 	///   h - height in tiles
-	Window: function (elem, w, h) {
+	Window: function(elem, w, h) {
+		"use strict";
 		this.elem = elem;
 		this.w = w;
 		this.h = h;
@@ -79,8 +81,8 @@ var UT = {
 		this.cy = Math.floor(this.h/2);
 
 		// Add CSS class if not added already
-		if (elem.className.indexOf(UT.CSSCLASS) == -1) {
-			if (elem.className.length == 0) elem.className = UT.CSSCLASS;
+		if (elem.className.indexOf(UT.CSSCLASS) === -1) {
+			if (elem.className.length === 0) elem.className = UT.CSSCLASS;
 			else elem.className += " " + UT.CSSCLASS;
 		}
 
@@ -93,14 +95,14 @@ var UT = {
 			y = Math.round(y);
 			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
 			this.buffer[y][x] = tile;
-		}
+		};
 
 		this.get = function(x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
-			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
+			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return new UT.Tile();
 			return this.buffer[y][x];
-		}
+		};
 
 		this.proceduralFill = function(func, offsetx, offsety) {
 			offsetx = offsetx || 0;
@@ -108,13 +110,13 @@ var UT = {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
 					this.buffer[j][i] = func(i+offsetx, j+offsety);
-		}
+		};
 
 		this.clear = function(char) {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
 					this.buffer[j][i] = new UT.Tile(char);
-		}
+		};
 
 		this.render = function() {
 			var html = "";
@@ -127,7 +129,7 @@ var UT = {
 				html += "\n";
 			}
 			this.elem.innerHTML = html;
-		}
+		};
 
 		this.clear();
 	}

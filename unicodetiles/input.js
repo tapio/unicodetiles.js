@@ -42,6 +42,7 @@ document.onkeydown = handleKeyDown;
 document.onkeyup = handleKeyUp;
 
 function handleKeyDown(event) {
+	"use strict";
 	var k = event.keyCode;
 	pressedKeys[k] = true;
 
@@ -50,6 +51,7 @@ function handleKeyDown(event) {
 }
 
 function handleKeyUp(event) {
+	"use strict";
 	pressedKeys[event.keyCode] = false;
 	return false;
 }
