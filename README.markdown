@@ -5,7 +5,7 @@ This JavaScript library provides a text character based tile engine for creating
 
 
 Current features
-================
+----------------
 * Colored characters
 * Colored character backgrounds
 * Arbitrary "character window" size
@@ -13,13 +13,13 @@ Current features
 
 
 Usage
-=====
+-----
 
 Pending
 
 
 License
-=======
+-------
 
 Copyright (c) 2012 Tapio Vierros
 	
