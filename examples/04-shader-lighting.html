@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Dungeon with Lighting Utilizing a Shader Function</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript" src="../unicodetiles/input.js"></script>
+	<!-- We are extending the simple-dungeon example -->
+	<script type="text/javascript" src="simple-dungeon.js"></script>
+	<script type="text/javascript">
+		var LIGHT_COLOR = { r: 255, g: 255, b: 0 };
+		var LIGHT_INTENSITY = 0.7;
+		var MAX_DIST = 5;
+
+		// Helper function that calculates a distance
+		function distance(x1, y1, x2, y2) {
+			return Math.sqrt((x2-x1)*(x2-x1) + (y2-y1)*(y2-y1));
+		}
+
+		// Helper function that does blending between two values
+		function blend(a, b, f) {
+			return a*f + b*(1.0-f);
+		}
+
+		// Shades the tile according to distance from player
+		function doLighting(tile, x, y) {
+			var d = distance(pl.x, pl.y, x, y);
+			if (d >= MAX_DIST) return tile;
+			var f = (1.0 - (d / MAX_DIST)) * LIGHT_INTENSITY;
+			tile.r = Math.round(blend(LIGHT_COLOR.r, tile.r, f));
+			tile.g = Math.round(blend(LIGHT_COLOR.g, tile.g, f));
+			tile.b = Math.round(blend(LIGHT_COLOR.b, tile.b, f));
+			return tile;
+		}
+
+		// Initializes the lighting shader
+		function initLighting() {
+			eng.setShaderFunc(doLighting);
+		}
+	</script>
+</head>
+
+<body onload="initSimpleDungeon(); initLighting();"><div id="container">
+
+	<p class="centerer">Move around with arrow keys.</p>
+
+	<div class="centerer">
+		<div id="game"></div>
+	</div>
+
+</div></body>
+</html>
