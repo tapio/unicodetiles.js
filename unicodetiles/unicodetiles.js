@@ -205,6 +205,13 @@ var ut = {
 		///   func - function taking parameters (x, y) and returning a true if the tile is visible
 		this.setMaskFunc = function(func) { this.maskFunc = func; };
 
+		/// Function: setShaderFunc
+		/// Sets the function to be called to psot process / shade each visible tile.
+		///
+		/// Parameters:
+		///   func - function taking parameters (tile, x, y) and returning an ut.Tile
+		this.setShaderFunc = function(func) { this.shaderFunc = func; };
+
 		/// Function: render
 		/// Updates the window according to the given player coordinates.
 		this.update = function(x, y) {
@@ -214,9 +221,12 @@ var ut = {
 			var yy = y - this.window.cy;
 			for (var j = 0; j < this.window.h; ++j) {
 				for (var i = 0; i < this.window.w; ++i) {
-					if (!this.maskFunc || this.maskFunc(i+xx, j+yy))
-						this.window.unsafePut(this.tileFunc(i+xx,j+yy), i, j);
-					else this.window.unsafePut(ut.NULLTILE, i, j);
+					if (!this.maskFunc || this.maskFunc(i+xx, j+yy)) {
+						var tile = this.tileFunc(i+xx,j+yy);
+						if (this.shaderFunc)
+							tile = this.shaderFunc(tile, i+xx, j+yy);
+						this.window.unsafePut(tile, i, j);
+					} else this.window.unsafePut(ut.NULLTILE, i, j);
 				}
 			}
 		};
