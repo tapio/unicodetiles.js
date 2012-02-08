@@ -10,7 +10,7 @@ NDDIR="$DIR/../docs/NaturalDocs"
 mkdir -p "$OUTDIR" "$NDDIR"
 
 echo "Building API documentation..."
-$ND -i .. \
+$ND -i "$DIR/.." \
 	-o HTML "$OUTDIR" \
 	-p "$NDDIR" \
 	|| echo "API documentation building failed."
