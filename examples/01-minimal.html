@@ -9,13 +9,15 @@
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript">
 		var term, eng; // Can't be initialized yet because DOM is not ready
+		var chars = "☠☃⚙☻♞☭✈✟✂✯";
 
 		// Returns a random tile
 		function randomTile(x, y) {
 			var r = Math.floor(Math.random() * 255);
 			var g = Math.floor(Math.random() * 255);
 			var b = Math.floor(Math.random() * 255);
-			return new ut.Tile('#', r, g, b);
+			var c = Math.floor(Math.random() * chars.length);
+			return new ut.Tile(chars[c], r, g, b);
 		}
 
 		// Called after HTML is loaded, initializes UnicodeTiles etc.
@@ -34,6 +36,8 @@
 </head>
 
 <body onload="start();"><div id="container">
+
+	<p class="centerer">You should see various colorful symbols.</p>
 
 	<div class="centerer">
 		<div id="game"></div>
