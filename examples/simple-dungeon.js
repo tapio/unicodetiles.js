@@ -35,13 +35,14 @@ var map = [
 
 // Returns a Tile from the char array map
 function getDungeonTile(x, y) {
-	x = Math.round(x), y = Math.round(y);
+	x = Math.round(x);
+	y = Math.round(y);
 	var t = "";
 	try { t = map[y][x]; }
 	catch(err) { return ut.NULLTILE; }
 	if (t === '#') return new ut.Tile('#', 100, 100, 100);
 	if (t === ' ') return new ut.Tile('.', 50, 50, 50);
-	return ut.NULLTILE;;
+	return ut.NULLTILE;
 }
 
 // Initialize stuff
