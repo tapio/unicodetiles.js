@@ -1,7 +1,7 @@
 UnicodeTiles.js
 ===============
 
-This JavaScript library provides a text character based tile engine for creating roguelike games etc. The bundled font (DejaVu Sans Mono) has good coverage of Unicode, providing monospace characters for various miscellaneous symbols that can be useful in creating fancy looking character based games and user interfaces.
+This JavaScript library provides a text character based tile engine for creating [roguelike](http://en.wikipedia.org/wiki/Roguelike) games etc. The bundled font ([DejaVu Sans Mono](http://dejavu-fonts.org/)) has good coverage of Unicode, providing monospace characters for various miscellaneous symbols that can be useful in creating fancy looking character based games and user interfaces.
 
 
 Current features
@@ -26,14 +26,19 @@ Current features
 		+ See examples/ subfolder
 	- Minification toolchain through [Google Closure Compiler](http://closure-compiler.appspot.com/)
 
+
 Usage
 -----
 
-See examples/ subdirectory.
+See [examples-subdirectory](examples/).
 
 
 License
 -------
+
+Deja Vu fonts &copy; Bitstream. See the license at [http://dejavu-fonts.org/wiki/License](http://dejavu-fonts.org/wiki/License) for more information.
+
+The actual code and all other things are licensed as follows:
 
 Copyright (c) 2012 Tapio Vierros
 	

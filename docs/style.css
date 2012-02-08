@@ -25,11 +25,15 @@ h1 {
 
 h2 {
 	font-size: 1.2em;
-	color: #55f;
+	color: #77f;
 }
 
 a {
 	color: #44a;
+}
+
+a:hover {
+	text-decoration: none;
 }
 
 .download {
