@@ -40,7 +40,8 @@ function getDungeonTile(x, y) {
 	try { t = map[y][x]; }
 	catch(err) { return ut.NULLTILE; }
 	if (t === '#') return new ut.Tile('#', 100, 100, 100);
-	return new ut.Tile(t);
+	if (t === ' ') return new ut.Tile('.', 50, 50, 50);
+	return ut.NULLTILE;;
 }
 
 // Initialize stuff
