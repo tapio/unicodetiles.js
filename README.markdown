@@ -6,16 +6,30 @@ This JavaScript library provides a text character based tile engine for creating
 
 Current features
 ----------------
-* Colored characters
-* Colored character backgrounds
-* Arbitrary "character window" size
-* Utilizes CSS3 Web Fonts (@font-face)
-
+* Viewport - _character grid display_
+	- Colored characters
+	- Colored character backgrounds
+	- Arbitrary character viewport size
+	- Character size customizable through CSS
+	- Utilizes CSS3 Web Fonts (@font-face)
+* Engine - _the tile engine_
+	- Viewport updating according to player coordinates
+	- Tile reading through a callback
+	- Masking callback (for FOV etc.)
+* Meta - _General meta stuff_
+	- Comprehensive API documentation
+		+ Generated with Natural Docs from source code comments
+	- Static analysis frequently performed
+		+ [JSHint](http://www.jshint.com/)
+		+ [Google Closure Compiler](http://closure-compiler.appspot.com/)
+	- Several examples / tutorials
+		+ See examples/ subfolder
+	- Minification toolchain through [Google Closure Compiler](http://closure-compiler.appspot.com/)
 
 Usage
 -----
 
-Pending
+See examples/ subdirectory.
 
 
 License
