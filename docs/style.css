@@ -36,6 +36,14 @@ a:hover {
 	text-decoration: none;
 }
 
+a.backlink {
+	text-align: center;
+	color: #333;
+	display: block;
+	margin-top: 20px;
+	font-size: 80%;
+}
+
 .download {
 	float: right;
 }
