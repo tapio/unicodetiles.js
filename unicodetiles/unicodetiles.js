@@ -1,7 +1,7 @@
 
-/// Namespace: UT
+/// Namespace: ut
 /// The tile engine classses etc. are wrapped inside this.
-var UT = {
+var ut = {
 
 	/// Constants: Unicodetiles constants
 	/// NULLCHAR - Character used when none is specified otherwise.
@@ -25,7 +25,7 @@ var UT = {
 	///   bb - (optional) blue background color component
 	Tile: function(ch, r, g, b, br, bg, bb) {
 		"use strict";
-		this.ch = ch || UT.NULLCHAR;
+		this.ch = ch || ut.NULLCHAR;
 		this.r = r; 
 		this.g = g;
 		this.b = b;
@@ -81,9 +81,9 @@ var UT = {
 		this.cy = Math.floor(this.h/2);
 
 		// Add CSS class if not added already
-		if (elem.className.indexOf(UT.CSSCLASS) === -1) {
-			if (elem.className.length === 0) elem.className = UT.CSSCLASS;
-			else elem.className += " " + UT.CSSCLASS;
+		if (elem.className.indexOf(ut.CSSCLASS) === -1) {
+			if (elem.className.length === 0) elem.className = ut.CSSCLASS;
+			else elem.className += " " + ut.CSSCLASS;
 		}
 
 		this.buffer = new Array(h);
@@ -100,7 +100,7 @@ var UT = {
 		this.get = function(x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
-			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return new UT.Tile();
+			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return new ut.Tile();
 			return this.buffer[y][x];
 		};
 
@@ -115,7 +115,7 @@ var UT = {
 		this.clear = function(ch) {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
-					this.buffer[j][i] = new UT.Tile(ch);
+					this.buffer[j][i] = new ut.Tile(ch);
 		};
 
 		this.render = function() {

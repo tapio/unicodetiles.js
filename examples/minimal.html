@@ -14,12 +14,12 @@
 			var r = Math.floor(Math.random() * 255);
 			var g = Math.floor(Math.random() * 255);
 			var b = Math.floor(Math.random() * 255);
-			return new UT.Tile('#', r, g, b);
+			return new ut.Tile('#', r, g, b);
 		}
 
 		// Called after HTML is loaded, initializes UnicodeTiles etc.
 		function start() {
-			term = new UT.Window(document.getElementById("game"), 51, 25);
+			term = new ut.Window(document.getElementById("game"), 51, 25);
 			window.setInterval("tick()", 250);
 		}
 

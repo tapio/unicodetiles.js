@@ -46,14 +46,14 @@
 		function getDungeonTile(x, y) {
 			var t = "";
 			try { t = map[y][x]; }
-			catch(err) { return new UT.Tile(t); }
-			if (t === '#') return new UT.Tile('#', 100, 100, 100);
-			return new UT.Tile(t);
+			catch(err) { return new ut.Tile(t); }
+			if (t === '#') return new ut.Tile('#', 100, 100, 100);
+			return new ut.Tile(t);
 		}
 
 		function start() {
 			window.setInterval("tick()", 150);
-			term = new UT.Window(document.getElementById("game"), 41, 25);
+			term = new ut.Window(document.getElementById("game"), 41, 25);
 		}
 
 		function handleKeys() {
@@ -71,7 +71,7 @@
 			// Map
 			term.proceduralFill(getDungeonTile, pl.x-term.cx, pl.y-term.cy);
 			// Player character
-			term.put(new UT.Tile("@", 255, 255, 255), term.cx, term.cy);
+			term.put(new ut.Tile("@", 255, 255, 255), term.cx, term.cy);
 			// Render
 			term.render();
 		}
