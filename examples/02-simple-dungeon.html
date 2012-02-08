@@ -7,75 +7,13 @@
 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript" src="../unicodetiles/input.js"></script>
-	<script type="text/javascript">
-		var term, eng; // Can't be initialized yet because DOM is not ready
-		var pl = { x: 3, y: 2 };
-		var map = [
-			"##############################",
-			"##   ###############   #######",
-			"##          ########      ####",
-			"##   ###### ########  ### ####",
-			"########### ############# ####",
-			"########### ############     #",
-			"########### ############     #",
-			"########### ############     #",
-			"###########                  #",
-			"############## ###############",
-			"############## #######    ####",
-			"#        ##### ####### #  ####",
-			"#  ####   #### ####### #######",
-			"#         #### ####### #######",
-			"#         #### #######      ##",
-			"## ########### #######      ##",
-			"## ########### ########### ###",
-			"## ########### ########### ###",
-			"## ########### ########### ###",
-			"## #####       ########### ###",
-			"## #####     # ########### ###",
-			"## #####     # ########### ###",
-			"## #####     # ########### ###",
-			"## #####     # ########### ###",
-			"## ########### ########### ###",
-			"## ########### ########### ###",
-			"## ###########             ###",
-			"## ############# #############",
-			"##               #############",
-			"##############################"
-		];
-
-		function getDungeonTile(x, y) {
-			var t = "";
-			try { t = map[y][x]; }
-			catch(err) { return ut.NULLTILE; }
-			if (t === '#') return new ut.Tile('#', 100, 100, 100);
-			return new ut.Tile(t);
-		}
-
-		function start() {
-			window.setInterval("tick()", 150);
-			term = new ut.Viewport(document.getElementById("game"), 41, 25);
-			eng = new ut.Engine(term, getDungeonTile);
-		}
-
-		function handleKeys() {
-			var oldx = pl.x, oldy = pl.y;
-			if (pressedKeys[KEY_LEFT])  pl.x--;
-			if (pressedKeys[KEY_RIGHT]) pl.x++;
-			if (pressedKeys[KEY_UP])    pl.y--;
-			if (pressedKeys[KEY_DOWN])  pl.y++;
-			if (getDungeonTile(pl.x, pl.y).getChar() === '#') { pl.x = oldx; pl.y = oldy; }
-		}
-
-		function tick() {
-			handleKeys(); // Input
-			eng.update(pl.x, pl.y); // Update tiles
-			term.put(new ut.Tile("@", 255, 255, 255), term.cx, term.cy); // Player character
-			term.render(); // Render
-		}
-	</script> 
+	<!--
+		Check the JS file below for the actual source code!
+	-->
+	<script type="text/javascript" src="simple-dungeon.js"></script> 
 </head>
 
-<body onload="start();"><div id="container">
+<body onload="initSimpleDungeon();"><div id="container">
 
 	<p class="centerer">Move around with arrow keys.</p>
 
