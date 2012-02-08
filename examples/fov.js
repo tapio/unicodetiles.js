@@ -5,7 +5,7 @@ function hasLOS(startx, starty, targetx, targety) {
 	var dx = distx / maxdist, dy = disty / maxdist;
 	var xx = startx, yy = starty;
 	for (var i = 0; i < maxdist; ++i) {
-		if (getDungeonTile(xx,yy).getChar() === "#")
+		if (eng.tileFunc(xx,yy).getChar() !== ".")
 			return false;
 		xx += dx; yy += dy;
 	}
