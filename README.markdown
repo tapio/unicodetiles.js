@@ -27,8 +27,14 @@ Current features
 	- Minification toolchain through [Google Closure Compiler](http://closure-compiler.appspot.com/)
 
 
-Usage
------
+Documentation
+-------------
+
+See [docs/html](docs/html/).
+
+
+Examples
+--------
 
 See [examples-subdirectory](examples/).
 
