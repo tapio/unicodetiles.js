@@ -197,7 +197,7 @@ var ut = {
 		///
 		/// Parameters:
 		///   func - function taking parameters (x, y) and returning an ut.Tile
-		this.setTileFunc = function(func) { this.maskFunc = func; };
+		this.setTileFunc = function(func) { this.tileFunc = func; };
 
 		/// Function: setMaskFunc
 		/// Sets the function to be called to fetch mask information according to coordinates.
