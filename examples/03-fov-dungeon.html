@@ -10,11 +10,11 @@
 	<!-- We are extending the simple-dungeon example -->
 	<script type="text/javascript" src="simple-dungeon.js"></script> 
 	<script type="text/javascript">
-		function calculateFov(x, y) {
-			var distx = x - pl.x, disty = y - pl.y;
+		function hasLOS(startx, starty, targetx, targety) {
+			var distx = targetx - startx, disty = targety - starty;
 			var maxdist = Math.max(Math.abs(distx), Math.abs(disty));
 			var dx = distx / maxdist, dy = disty / maxdist;
-			var xx = pl.x, yy = pl.y;
+			var xx = startx, yy = starty;
 			for (var i = 0; i < maxdist; ++i) {
 				if (getDungeonTile(xx,yy).getChar() === "#")
 					return false;
@@ -23,9 +23,20 @@
 			return true;
 		}
 
+		function calculateFOV(x, y) {
+			// Shoot a beam from the four corners of the player tile
+			// to the corresponding corners of the target tile
+			var d = 0.3;
+			if (hasLOS(pl.x-d, pl.y-d, x-d, y-d)) return true;
+			if (hasLOS(pl.x+d, pl.y-d, x+d, y-d)) return true;
+			if (hasLOS(pl.x+d, pl.y+d, x+d, y+d)) return true;
+			if (hasLOS(pl.x-d, pl.y+d, x-d, y+d)) return true;
+			return false;
+		}
+
 		// Initializes the FOV
 		function initFOV() {
-			eng.setMaskFunc(calculateFov);
+			eng.setMaskFunc(calculateFOV);
 		}
 	</script> 
 </head>
