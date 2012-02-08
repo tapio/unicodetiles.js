@@ -1,3 +1,5 @@
+/// File: unicodetiles.js
+/// This file contains the main tile engine namespace.
 
 /// Namespace: ut
 /// The tile engine classses etc. are wrapped inside this.
