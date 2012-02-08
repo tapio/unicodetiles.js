@@ -47,7 +47,7 @@ function getDungeonTile(x, y) {
 // Initialize stuff
 function initSimpleDungeon() {
 	window.setInterval("tick()", 150);
-	term = new ut.Viewport(document.getElementById("game"), 41, 25);
+	term = new ut.Viewport(document.getElementById("game"), 41, 29);
 	eng = new ut.Engine(term, getDungeonTile);
 }
 
