@@ -5,8 +5,8 @@ ND="naturaldocs"
 $ND -h >/dev/null 2>&1 || echo "Cannot find NaturalDocs!"
 
 DIR=$(dirname $(readlink -f $0))
-OUTDIR="$DIR/html"
-NDDIR="$DIR/NaturalDocs"
+OUTDIR="$DIR/../docs/html"
+NDDIR="$DIR/../docs/NaturalDocs"
 mkdir -p "$OUTDIR" "$NDDIR"
 
 echo "Building API documentation..."
