@@ -3,11 +3,13 @@
 /// The tile engine classses etc. are wrapped inside this.
 var ut = {
 
-	/// Constants: Unicodetiles constants
+	/// Constants: Semi-internal constants for ut namespace
 	/// NULLCHAR - Character used when none is specified otherwise.
 	/// CSSCLASS - The CSS class name used for the tile engine element.
+	/// NULLTILE - The tile used as placeholder for empty tile
 	NULLCHAR: " ",
 	CSSCLASS: "unicodetiles",
+	NULLTILE: {}, // Initialized properly after the namespace
 
 	/// Class: Tile
 	/// Represents a unicode character tile with various attributes.
@@ -74,7 +76,6 @@ var ut = {
 		/// Clears the background color of this tile.
 		this.resetBackground = function() { this.br = this.bg = this.bb = undefined; };
 	},
-
 
 	/// Class: Viewport
 	/// The tile engine viewport / renderer / window.
@@ -145,7 +146,7 @@ var ut = {
 		this.get = function(x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
-			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return new ut.Tile();
+			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return ut.NULLTILE;
 			return this.buffer[y][x];
 		};
 
@@ -154,7 +155,7 @@ var ut = {
 		this.clear = function() {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
-					this.buffer[j][i] = ut.NULLCHAR;
+					this.buffer[j][i] = ut.NULLTILE;
 		};
 
 		/// Function: render
@@ -215,9 +216,11 @@ var ut = {
 				for (var i = 0; i < this.window.w; ++i) {
 					if (!this.maskFunc || this.maskFunc(i+xx, j+yy))
 						this.window.unsafePut(this.tileFunc(i+xx,j+yy), i, j);
-					else this.window.unsafePut(ut.NULLCHAR, i, j);
+					else this.window.unsafePut(ut.NULLTILE, i, j);
 				}
 			}
 		};
 	}
 };
+
+ut.NULLTILE = new ut.Tile();

@@ -46,7 +46,7 @@
 		function getDungeonTile(x, y) {
 			var t = "";
 			try { t = map[y][x]; }
-			catch(err) { return new ut.Tile(t); }
+			catch(err) { return ut.NULLTILE; }
 			if (t === '#') return new ut.Tile('#', 100, 100, 100);
 			return new ut.Tile(t);
 		}
