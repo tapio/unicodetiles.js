@@ -7,7 +7,7 @@
 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript">
-		var term; // Can't be initialized yet because DOM is not ready
+		var term, eng; // Can't be initialized yet because DOM is not ready
 
 		// Returns a random tile
 		function randomTile(x, y) {
@@ -19,13 +19,14 @@
 
 		// Called after HTML is loaded, initializes UnicodeTiles etc.
 		function start() {
-			term = new ut.Window(document.getElementById("game"), 51, 25);
-			window.setInterval("tick()", 250);
+			term = new ut.Viewport(document.getElementById("game"), 51, 25);
+			eng = new ut.Engine(term, randomTile);
+			window.setInterval("tick()", 150);
 		}
 
 		// Called every now and then to update the screen
 		function tick() {
-			term.proceduralFill(randomTile, 0, 0);
+			eng.update();
 			term.render();
 		}
 	</script> 

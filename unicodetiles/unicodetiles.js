@@ -62,17 +62,17 @@ var ut = {
 	},
 
 
-	/// Class: Window
-	/// The tile engine viewport / container / "the thing".
+	/// Class: Viewport
+	/// The tile engine viewport / renderer / window.
 
-	/// Constructor: Window
-	/// Constructs a new Window object.
+	/// Constructor: Viewport
+	/// Constructs a new Viewport object.
 	///
 	/// Parameters:
 	///   elem - the DOM element which shall be transformed into the tile engine
 	///   w - width in tiles
 	///   h - height in tiles
-	Window: function(elem, w, h) {
+	Viewport: function(elem, w, h) {
 		"use strict";
 		this.elem = elem;
 		this.w = w;
@@ -86,18 +86,19 @@ var ut = {
 			else elem.className += " " + ut.CSSCLASS;
 		}
 
+		// Create 2-dimensional array to hold the viewport tiles
 		this.buffer = new Array(h);
 		for (var j = 0; j < h; ++j)
 			this.buffer[j] = new Array(w);
-
-		this.mask = new Array(h);
-		for (var k = 0; k < h; ++k)
-			this.mask[k] = new Array(w);
 
 		this.put = function(tile, x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
 			if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
+			this.buffer[y][x] = tile;
+		};
+
+		this.unsafePut = function(tile, x, y) {
 			this.buffer[y][x] = tile;
 		};
 
@@ -108,37 +109,10 @@ var ut = {
 			return this.buffer[y][x];
 		};
 
-		this.setMask = function(func, offsetx, offsety) {
-			offsetx = offsetx || 0;
-			offsety = offsety || 0;
-			for (var j = 0; j < this.h; ++j) {
-				for (var i = 0; i < this.w; ++i) {
-					this.mask[j][i] = func(i+offsetx, j+offsety);
-					if (!this.mask[j][i])
-						this.buffer[j][i] = ut.NULLCHAR;
-				}
-			}
-		};
-
-		this.proceduralFill = function(func, offsetx, offsety) {
-			offsetx = offsetx || 0;
-			offsety = offsety || 0;
-			for (var j = 0; j < this.h; ++j) {
-				for (var i = 0; i < this.w; ++i) {
-					if (this.mask[j][i])
-						this.buffer[j][i] = func(i+offsetx, j+offsety);
-					else this.buffer[j][i] = ut.NULLCHAR;
-				}
-			}
-		};
-
 		this.clear = function() {
-			for (var j = 0; j < this.h; ++j) {
-				for (var i = 0; i < this.w; ++i) {
-					this.buffer[j][i] = new ut.Tile();
-					this.mask[j][i] = true;
-				}
-			}
+			for (var j = 0; j < this.h; ++j)
+				for (var i = 0; i < this.w; ++i)
+					this.buffer[j][i] = ut.NULLCHAR;
 		};
 
 		this.render = function() {
@@ -155,6 +129,51 @@ var ut = {
 		};
 
 		this.clear();
-	}
+	},
 
+	/// Class: Engine
+	/// The tile engine itself.
+
+	/// Constructor: Engine
+	/// Constructs a new Engine object.
+	///
+	/// Parameters:
+	///   win - the ut.Window instance to use as the viewport
+	///   tileFunc - the function used for fetching tiles
+	Engine: function(win, tileFunc) {
+		"use strict";
+		this.window = win;
+		this.tileFunc = tileFunc;
+
+		/// Function: setTileFunc
+		/// Sets the function to be called to fetch each tile according to coordinates.
+		///
+		/// Parameters:
+		///   func - function taking parameters (x, y) and returning a ut.Tile
+		this.setTileFunc = function(func) { this.maskFunc = func; };
+
+		/// Function: setMaskFunc
+		/// Sets the function to be called to fetch mask information according to coordinates.
+		///
+		/// Parameters:
+		///   func - function taking parameters (x, y) and returning a true if the tile is visible
+		this.setMaskFunc = function(func) { this.maskFunc = func; };
+
+		/// Function: render
+		/// Updates the window according to the given player coordinates.
+		this.update = function(x, y) {
+			x = x || 0;
+			y = y || 0;
+			var xx = x - this.window.cx;
+			var yy = y - this.window.cy;
+			for (var j = 0; j < this.window.h; ++j) {
+				for (var i = 0; i < this.window.w; ++i) {
+					if (!this.maskFunc || this.maskFunc(i+xx, j+yy))
+						this.window.unsafePut(this.tileFunc(i+xx,j+yy), i, j);
+					else this.window.unsafePut(ut.NULLCHAR, i, j);
+				}
+			}
+		};
+
+	}
 };

@@ -8,7 +8,7 @@
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript" src="../unicodetiles/input.js"></script>
 	<script type="text/javascript">
-		var term; // Can't be initialized yet because DOM is not ready
+		var term, eng; // Can't be initialized yet because DOM is not ready
 		var pl = { x: 3, y: 2 };
 		var map = [
 			"##############################",
@@ -67,7 +67,9 @@
 
 		function start() {
 			window.setInterval("tick()", 150);
-			term = new ut.Window(document.getElementById("game"), 41, 25);
+			term = new ut.Viewport(document.getElementById("game"), 41, 25);
+			eng = new ut.Engine(term, getDungeonTile);
+			eng.setMaskFunc(calculateFov);
 		}
 
 		function handleKeys() {
@@ -80,16 +82,10 @@
 		}
 
 		function tick() {
-			// Input
-			handleKeys();
-			// Fov
-			term.setMask(calculateFov, pl.x-term.cx, pl.y-term.cy);
-			// Map
-			term.proceduralFill(getDungeonTile, pl.x-term.cx, pl.y-term.cy);
-			// Player character
-			term.put(new ut.Tile("@", 255, 255, 255), term.cx, term.cy);
-			// Render
-			term.render();
+			handleKeys(); // Input
+			eng.update(pl.x, pl.y); // Update tiles
+			term.put(new ut.Tile("@", 255, 255, 255), term.cx, term.cy); // Player character
+			term.render(); // Render
 		}
 	</script> 
 </head>
