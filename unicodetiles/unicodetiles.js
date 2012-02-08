@@ -90,6 +90,10 @@ var ut = {
 		for (var j = 0; j < h; ++j)
 			this.buffer[j] = new Array(w);
 
+		this.mask = new Array(h);
+		for (var k = 0; k < h; ++k)
+			this.mask[k] = new Array(w);
+
 		this.put = function(tile, x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
@@ -104,18 +108,37 @@ var ut = {
 			return this.buffer[y][x];
 		};
 
+		this.setMask = function(func, offsetx, offsety) {
+			offsetx = offsetx || 0;
+			offsety = offsety || 0;
+			for (var j = 0; j < this.h; ++j) {
+				for (var i = 0; i < this.w; ++i) {
+					this.mask[j][i] = func(i+offsetx, j+offsety);
+					if (!this.mask[j][i])
+						this.buffer[j][i] = ut.NULLCHAR;
+				}
+			}
+		};
+
 		this.proceduralFill = function(func, offsetx, offsety) {
 			offsetx = offsetx || 0;
 			offsety = offsety || 0;
-			for (var j = 0; j < this.h; ++j)
-				for (var i = 0; i < this.w; ++i)
-					this.buffer[j][i] = func(i+offsetx, j+offsety);
+			for (var j = 0; j < this.h; ++j) {
+				for (var i = 0; i < this.w; ++i) {
+					if (this.mask[j][i])
+						this.buffer[j][i] = func(i+offsetx, j+offsety);
+					else this.buffer[j][i] = ut.NULLCHAR;
+				}
+			}
 		};
 
-		this.clear = function(ch) {
-			for (var j = 0; j < this.h; ++j)
-				for (var i = 0; i < this.w; ++i)
-					this.buffer[j][i] = new ut.Tile(ch);
+		this.clear = function() {
+			for (var j = 0; j < this.h; ++j) {
+				for (var i = 0; i < this.w; ++i) {
+					this.buffer[j][i] = new ut.Tile();
+					this.mask[j][i] = true;
+				}
+			}
 		};
 
 		this.render = function() {
