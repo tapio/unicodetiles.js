@@ -54,10 +54,10 @@ function initSimpleDungeon() {
 // Simple movement with arrows and collision detection
 function handleKeys() {
 	var oldx = pl.x, oldy = pl.y;
-	if (pressedKeys[KEY_LEFT])  pl.x--;
-	if (pressedKeys[KEY_RIGHT]) pl.x++;
-	if (pressedKeys[KEY_UP])    pl.y--;
-	if (pressedKeys[KEY_DOWN])  pl.y++;
+	if (pressedKeys[KEY_LEFT]  || pressedKeys[KEY_H]) pl.x--;
+	if (pressedKeys[KEY_RIGHT] || pressedKeys[KEY_L]) pl.x++;
+	if (pressedKeys[KEY_UP]    || pressedKeys[KEY_K]) pl.y--;
+	if (pressedKeys[KEY_DOWN]  || pressedKeys[KEY_J]) pl.y++;
 	if (getDungeonTile(pl.x, pl.y).getChar() === '#') { pl.x = oldx; pl.y = oldy; }
 }
 
