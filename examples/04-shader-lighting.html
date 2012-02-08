@@ -27,10 +27,12 @@
 		}
 
 		// Shades the tile according to distance from player
-		function doLighting(tile, x, y) {
+		function doLighting(tile, x, y, time) {
+			var anim = time / 1000.0;
+			anim = Math.abs(anim - Math.floor(anim) - 0.5) + 0.5;
 			var d = distance(pl.x, pl.y, x, y);
 			if (d >= MAX_DIST) return tile;
-			var f = (1.0 - (d / MAX_DIST)) * LIGHT_INTENSITY;
+			var f = (1.0 - (d / MAX_DIST)) * LIGHT_INTENSITY * anim;
 			tile.r = Math.round(blend(LIGHT_COLOR.r, tile.r, f));
 			tile.g = Math.round(blend(LIGHT_COLOR.g, tile.g, f));
 			tile.b = Math.round(blend(LIGHT_COLOR.b, tile.b, f));

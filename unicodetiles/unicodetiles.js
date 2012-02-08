@@ -219,12 +219,13 @@ var ut = {
 			y = y || 0;
 			var xx = x - this.window.cx;
 			var yy = y - this.window.cy;
+			var timeNow = new Date().getTime();
 			for (var j = 0; j < this.window.h; ++j) {
 				for (var i = 0; i < this.window.w; ++i) {
 					if (!this.maskFunc || this.maskFunc(i+xx, j+yy)) {
 						var tile = this.tileFunc(i+xx,j+yy);
 						if (this.shaderFunc)
-							tile = this.shaderFunc(tile, i+xx, j+yy);
+							tile = this.shaderFunc(tile, i+xx, j+yy, timeNow);
 						this.window.unsafePut(tile, i, j);
 					} else this.window.unsafePut(ut.NULLTILE, i, j);
 				}
