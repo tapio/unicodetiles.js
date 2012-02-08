@@ -1,0 +1,54 @@
+body {
+	margin-top: 1.0em;
+	color: #eee;
+	background-color: #151520;
+	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
+}
+
+#ribbon {
+	position: absolute;
+	top: 0;
+	right: 0;
+	border: 0;
+}
+
+#container {
+	margin: 0 auto;
+	width: 700px;
+}
+
+h1 {
+	font-size: 3.0em;
+	color: #229;
+	margin-bottom: 3px;
+}
+
+h2 {
+	font-size: 1.2em;
+	color: #55f;
+}
+
+a {
+	color: #44a;
+}
+
+.download {
+	float: right;
+}
+
+.download img {
+	border-style: none;
+	width: 90px;
+}
+
+pre {
+	background: #000;
+	color: #fff;
+	padding: 15px;
+}
+
+footer {
+	text-align: center;
+	padding-top: 30px;
+	font-style: italic;
+}
