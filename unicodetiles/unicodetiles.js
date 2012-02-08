@@ -17,12 +17,12 @@ var ut = {
 	///
 	/// Parameters:
 	///   ch - a character to display for this tile
-	///   r - (optional) red color component
-	///   g - (optional) green color component
-	///   b - (optional) blue color component
-	///   br - (optional) red background color component
-	///   bg - (optional) green background color component
-	///   bb - (optional) blue background color component
+	///   r - (optional) red color component 0-255
+	///   g - (optional) green color component 0-255
+	///   b - (optional) blue color component 0-255
+	///   br - (optional) red background color component 0-255
+	///   bg - (optional) green background color component 0-255
+	///   bb - (optional) blue background color component 0-255
 	Tile: function(ch, r, g, b, br, bg, bb) {
 		"use strict";
 		this.ch = ch || ut.NULLCHAR;
@@ -37,7 +37,7 @@ var ut = {
 		/// Composes and returns the html representation of the tile.
 		///
 		/// Returns:
-		/// The html representation of the tile.
+		///   The html representation of the tile.
 		this.html = function() {
 			// Check if we have foreground / background colors
 			var fc = (this.r !== undefined && this.g !== undefined && this.b !== undefined);
@@ -52,12 +52,26 @@ var ut = {
 			return ret;
 		};
 
+		/// Function: getChar
+		/// Returns the character of this tile.
 		this.getChar = function() { return this.ch; };
+		/// Function: setChar
+		/// Sets the character of this tile.
 		this.setChar = function(ch) { this.ch = ch; };
+		/// Function: setColor
+		/// Sets the foreground color of this tile.
 		this.setColor = function(r, g, b) { this.r = r; this.g = g; this.b = b; };
+		/// Function: setGrey
+		/// Sets the foreground color to the given shade (0-255) of grey.
 		this.setGrey = function(grey) { this.r = grey; this.g = grey; this.b = grey; };
+		/// Function: setBackground
+		/// Sets the background color of this tile.
 		this.setBackground = function(r, g, b) { this.br = r; this.bg = g; this.bb = b; };
+		/// Function: resetColor
+		/// Clears the color of this tile / assigns default color.
 		this.resetColor = function() { this.r = this.g = this.b = undefined; };
+		/// Function: resetBackground
+		/// Clears the background color of this tile.
 		this.resetBackground = function() { this.br = this.bg = this.bb = undefined; };
 	},
 
@@ -91,6 +105,14 @@ var ut = {
 		for (var j = 0; j < h; ++j)
 			this.buffer[j] = new Array(w);
 
+		/// Function: put
+		/// Puts a tile to the given coordinates.
+		/// Checks bounds and does nothing if invalid coordinates are given.
+		///
+		/// Parameters:
+		///   tile - the tile to put
+		///   x - x coordinate
+		///   y - y coordinate
 		this.put = function(tile, x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
@@ -98,10 +120,28 @@ var ut = {
 			this.buffer[y][x] = tile;
 		};
 
+		/// Function: unsafePut
+		/// Puts a tile to the given coordinates.
+		/// Does *not* check bounds; throws exception if invalid coordinates are given.
+		///
+		/// Parameters:
+		///   tile - the tile to put
+		///   x - x coordinate
+		///   y - y coordinate
 		this.unsafePut = function(tile, x, y) {
 			this.buffer[y][x] = tile;
 		};
 
+		/// Function: get
+		/// Returns the tile in the given coordinates.
+		/// Checks bounds and returns empty tile if invalid coordinates are given.
+		///
+		/// Parameters:
+		///   x - x coordinate
+		///   y - y coordinate
+		///
+		/// Returns:
+		///   The tile.
 		this.get = function(x, y) {
 			x = Math.round(x);
 			y = Math.round(y);
@@ -109,12 +149,16 @@ var ut = {
 			return this.buffer[y][x];
 		};
 
+		/// Function: clear
+		/// Clears the viewport buffer by assigning empty tiles.
 		this.clear = function() {
 			for (var j = 0; j < this.h; ++j)
 				for (var i = 0; i < this.w; ++i)
 					this.buffer[j][i] = ut.NULLCHAR;
 		};
 
+		/// Function: render
+		/// Renders the buffer as html to the element specified at construction.
 		this.render = function() {
 			var html = "";
 			for (var j = 0; j < this.h; ++j) {
@@ -128,7 +172,7 @@ var ut = {
 			this.elem.innerHTML = html;
 		};
 
-		this.clear();
+		this.clear(); // Init the buffer by clearing it
 	},
 
 	/// Class: Engine
@@ -149,11 +193,12 @@ var ut = {
 		/// Sets the function to be called to fetch each tile according to coordinates.
 		///
 		/// Parameters:
-		///   func - function taking parameters (x, y) and returning a ut.Tile
+		///   func - function taking parameters (x, y) and returning an ut.Tile
 		this.setTileFunc = function(func) { this.maskFunc = func; };
 
 		/// Function: setMaskFunc
 		/// Sets the function to be called to fetch mask information according to coordinates.
+		/// If mask function returns false to some coordinates, then that tile is not rendered.
 		///
 		/// Parameters:
 		///   func - function taking parameters (x, y) and returning a true if the tile is visible
@@ -174,6 +219,5 @@ var ut = {
 				}
 			}
 		};
-
 	}
 };
