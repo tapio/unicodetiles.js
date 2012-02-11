@@ -170,7 +170,7 @@ var ut = {
 					if (tile.html) html += tile.html(); // Real tile
 					else html += tile; // Assumes string
 				}
-				html += "\n";
+				html += "<br />";
 			}
 			this.elem.innerHTML = html;
 		};
