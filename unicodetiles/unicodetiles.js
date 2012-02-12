@@ -1,6 +1,7 @@
 /// File: unicodetiles.js
 /// This file contains the main tile engine namespace.
 
+/*jshint trailing:true latedef:true */
 /*global document:true */
 
 /// Namespace: ut
@@ -32,7 +33,7 @@ var ut = {
 	Tile: function(ch, r, g, b, br, bg, bb) {
 		"use strict";
 		this.ch = ch || ut.NULLCHAR;
-		this.r = r; 
+		this.r = r;
 		this.g = g;
 		this.b = b;
 		this.br = br;
