@@ -1,0 +1,5 @@
+General:
+	* Test IE compatibility
+	* Add .eot webfont for IE9+
+Engine:
+	* When possible, move tiles instead of calling tileFunc

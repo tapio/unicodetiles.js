@@ -16,6 +16,7 @@ Current features
 	- Viewport updating according to player coordinates
 	- Tile reading through a callback
 	- Masking callback (for FOV etc.)
+	- Shader callback (for animating tiles)
 * Meta - _General meta stuff_
 	- Comprehensive API documentation
 		+ Generated with Natural Docs from source code comments
