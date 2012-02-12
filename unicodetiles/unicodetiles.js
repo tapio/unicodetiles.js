@@ -1,6 +1,8 @@
 /// File: unicodetiles.js
 /// This file contains the main tile engine namespace.
 
+/*global document:true */
+
 /// Namespace: ut
 /// The tile engine classses etc. are wrapped inside this.
 var ut = {
@@ -37,25 +39,6 @@ var ut = {
 		this.bg = bg;
 		this.bb = bb;
 
-		/// Function: html
-		/// Composes and returns the html representation of the tile.
-		///
-		/// Returns:
-		///   The html representation of the tile.
-		this.html = function() {
-			// Check if we have foreground / background colors
-			var fc = (this.r !== undefined && this.g !== undefined && this.b !== undefined);
-			var bc = (this.br !== undefined && this.bg !== undefined && this.bb !== undefined);
-			// If no coloring, just return the char
-			if (!fc && !bc) return this.ch;
-			// Inline CSS for coloring
-			var ret = '<span style="';
-			if (fc) ret += 'color:rgb('+this.r+','+this.g+','+this.b+');';
-			if (bc) ret += 'background-color:rgb('+this.br+','+this.bg+','+this.bb+');';
-			ret += '">' + this.ch + '</span>';
-			return ret;
-		};
-
 		/// Function: getChar
 		/// Returns the character of this tile.
 		this.getChar = function() { return this.ch; };
@@ -77,6 +60,34 @@ var ut = {
 		/// Function: resetBackground
 		/// Clears the background color of this tile.
 		this.resetBackground = function() { this.br = this.bg = this.bb = undefined; };
+		/// Function getColorHex
+		/// Returns the hexadecimal representation of the color
+		this.getColorHex = function() {
+			if (this.r !== undefined && this.g !== undefined && this.b !== undefined)
+				return "#" + this.r.toString(16) + this.g.toString(16) + this.b.toString(16);
+			else return "";
+		};
+		/// Function getBackgroundHex
+		/// Returns the hexadecimal representation of the background color
+		this.getBackgroundHex = function() {
+			if (this.br !== undefined && this.bg !== undefined && this.bb !== undefined)
+				return "#" + this.br.toString(16) + this.bg.toString(16) + this.bb.toString(16);
+			else return "";
+		};
+		/// Function getColorRGB
+		/// Returns the CSS rgb(r,g,b) representation of the color
+		this.getColorRGB = function() {
+			if (this.r !== undefined && this.g !== undefined && this.b !== undefined)
+				return 'rgb('+this.r+','+this.g+','+this.b+')';
+			else return "";
+		};
+		/// Function getBackgroundRGB
+		/// Returns the CSS rgb(r,g,b) representation of the background color
+		this.getBackgroundRGB = function() {
+			if (this.br !== undefined && this.bg !== undefined && this.bb !== undefined)
+				return 'rgb('+this.br+','+this.bg+','+this.bb+')';
+			else return "";
+		};
 	},
 
 	/// Class: Viewport
@@ -92,10 +103,12 @@ var ut = {
 	Viewport: function(elem, w, h) {
 		"use strict";
 		this.elem = elem;
+		this.elem.innerHTML = "";
 		this.w = w;
 		this.h = h;
 		this.cx = Math.floor(this.w/2);
 		this.cy = Math.floor(this.h/2);
+		var i, j;
 
 		// Add CSS class if not added already
 		if (elem.className.indexOf(ut.CSSCLASS) === -1) {
@@ -103,10 +116,24 @@ var ut = {
 			else elem.className += " " + ut.CSSCLASS;
 		}
 
-		// Create 2-dimensional array to hold the viewport tiles
+		// Create two 2-dimensional arrays to hold the viewport tiles and <span> elements
 		this.buffer = new Array(h);
-		for (var j = 0; j < h; ++j)
+		this.spans = new Array(h);
+		for (j = 0; j < h; ++j) {
 			this.buffer[j] = new Array(w);
+			this.spans[j] = new Array(w);
+		}
+
+		// Create a matrix of <span> elements, cache references
+		for (j = 0; j < this.h; ++j) {
+			for (i = 0; i < this.w; ++i) {
+				this.spans[j][i] = document.createElement("span");
+				this.elem.appendChild(this.spans[j][i]);
+			}
+			// Line break
+			this.spans[j].push(document.createElement("br"));
+			this.elem.appendChild(this.spans[j][this.w]);
+		}
 
 		/// Function: put
 		/// Puts a tile to the given coordinates.
@@ -163,16 +190,27 @@ var ut = {
 		/// Function: render
 		/// Renders the buffer as html to the element specified at construction.
 		this.render = function() {
-			var html = "";
 			for (var j = 0; j < this.h; ++j) {
 				for (var i = 0; i < this.w; ++i) {
 					var tile = this.buffer[j][i];
-					if (tile.html) html += tile.html(); // Real tile
-					else html += tile; // Assumes string
+					var span = this.spans[j][i];
+					// Check and update colors
+					// We use "data-" attributes for storing color info,
+					// so that we have a consistent format for it.
+					var fg = tile.getColorRGB();
+					var bg = tile.getBackgroundRGB();
+					if (fg !== span.getAttribute("data-fg") || bg !== span.getAttribute("data-bg")) {
+						span.setAttribute("data-fg", fg);
+						span.setAttribute("data-bg", bg);
+						span.style.color = fg;
+						span.style.backgroundColor = bg;
+					}
+					// Check and update character
+					var ch = tile.getChar();
+					if (ch !== span.innerHTML)
+						span.innerHTML = ch;
 				}
-				html += "<br />";
 			}
-			this.elem.innerHTML = html;
 		};
 
 		this.clear(); // Init the buffer by clearing it
