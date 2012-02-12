@@ -20,6 +20,9 @@ Current features
 * Meta - _General meta stuff_
 	- Comprehensive API documentation
 		+ Generated with Natural Docs from source code comments
+	- Broad browser support
+		+ Tested with Firefox 10, Chromium 16, Google Chrome 18b, Opera 11.61 + 12.0a
+		+ IE9+ is not yet thoroughly tested, but will be supported
 	- Static analysis frequently performed
 		+ [JSHint](http://www.jshint.com/)
 		+ [Google Closure Compiler](http://closure-compiler.appspot.com/)
