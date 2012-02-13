@@ -1,7 +1,7 @@
 UnicodeTiles.js
 ===============
 
-This JavaScript library provides a text character based tile engine for creating [roguelike](http://en.wikipedia.org/wiki/Roguelike) games etc. The bundled font ([DejaVu Sans Mono](http://dejavu-fonts.org/)) has decent coverage (3289 glyphs) of Unicode, providing monospace characters for various miscellaneous symbols that can be useful in creating fancy looking character based games and user interfaces.
+This JavaScript library provides a text character based tile engine for creating [roguelike](http://en.wikipedia.org/wiki/Roguelike) games etc. The bundled font ([DejaVu Sans Mono](http://dejavu-fonts.org/)) has decent coverage (3289 glyphs) of Unicode, providing monospace characters for [various miscellaneous symbols](http://tapio.github.com/unicodetiles.js/examples/01-minimal.html) that can be useful in creating fancy looking character based games and user interfaces.
 
 
 Current features

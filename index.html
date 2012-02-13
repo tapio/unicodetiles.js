@@ -23,7 +23,7 @@
 
 <h1>UnicodeTiles.js</h1>
 
-<p>This JavaScript library provides a text character based tile engine for creating <a href="http://en.wikipedia.org/wiki/Roguelike">roguelike</a> games etc. The bundled font (<a href="http://dejavu-fonts.org/">DejaVu Sans Mono</a>) has good coverage of Unicode, providing monospace characters for various miscellaneous symbols that can be useful in creating fancy looking character based games and user interfaces.</p>
+<p>This JavaScript library provides a text character based tile engine for creating <a href="http://en.wikipedia.org/wiki/Roguelike">roguelike</a> games etc. The bundled font (<a href="http://dejavu-fonts.org/">DejaVu Sans Mono</a>) has decent coverage (3289 glyphs) of Unicode, providing monospace characters for <a href="http://tapio.github.com/unicodetiles.js/examples/01-minimal.html">various miscellaneous symbols</a> that can be useful in creating fancy looking character based games and user interfaces.</p>
 
 <h2>Current features</h2>
 
@@ -41,12 +41,18 @@
 <li>Viewport updating according to player coordinates</li>
 <li>Tile reading through a callback</li>
 <li>Masking callback (for FOV etc.)</li>
+<li>Shader callback (for animating tiles)</li>
 </ul></li>
 <li>Meta - <em>General meta stuff</em>
 <ul>
 <li>Comprehensive API documentation
 <ul>
 <li>Generated with Natural Docs from source code comments</li>
+</ul></li>
+<li>Broad browser support
+<ul>
+<li>Tested with Firefox 10, Chromium 16, Google Chrome 18b, Opera 11.61 + 12.0a</li>
+<li>IE9+ is not yet thoroughly tested, but will be supported</li>
 </ul></li>
 <li>Static analysis frequently performed
 <ul>
