@@ -2,7 +2,10 @@
 
 @font-face {
 	font-family: 'DejaVuSansMono';
-	src: url('DejaVuSansMono.woff');
+	src: url('DejaVuSansMono.eot');
+	src: url('DejaVuSansMono.eot?#iefix') format('eot'),
+		 url('DejaVuSansMono.woff') format('woff'),
+		 url('DejaVuSansMono.ttf') format('truetype');
 }
 
 .unicodetiles {
