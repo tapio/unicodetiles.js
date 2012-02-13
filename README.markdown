@@ -1,7 +1,7 @@
 UnicodeTiles.js
 ===============
 
-This JavaScript library provides a text character based tile engine for creating [roguelike](http://en.wikipedia.org/wiki/Roguelike) games etc. The bundled font ([DejaVu Sans Mono](http://dejavu-fonts.org/)) has decent coverage (3289 glyphs) of Unicode, providing monospace characters for [various miscellaneous symbols](http://tapio.github.com/unicodetiles.js/examples/01-minimal.html) that can be useful in creating fancy looking character based games and user interfaces.
+This JavaScript library provides a text character based tile engine for creating [roguelike](http://en.wikipedia.org/wiki/Roguelike) games etc. The bundled font ([DejaVu Sans Mono](http://dejavu-fonts.org/)) has decent coverage (3289 glyphs) of Unicode, providing monospace characters for [various miscellaneous symbols](http://tapio.github.com/unicodetiles.js/examples/01-minimal.html) that can be useful in creating fancy looking character based games and user interfaces. This page itself uses the font.
 
 
 Current features
@@ -11,7 +11,7 @@ Current features
 	- Colored character backgrounds
 	- Arbitrary character viewport size
 	- Character size customizable through CSS
-	- Utilizes CSS3 Web Fonts (@font-face)
+	- Utilizes CSS3 Web Fonts (@font-face) to provide consistent look across platforms.
 * Engine - _the tile engine_
 	- Viewport updating according to player coordinates
 	- Tile reading through a callback
@@ -23,6 +23,7 @@ Current features
 	- Broad browser support
 		+ Tested with Firefox 10, Chromium 16, Google Chrome 18b, Opera 11.61 + 12.0a
 		+ IE9+ is not yet thoroughly tested, but will be supported
+		+ IE8 and below are not targeted
 	- Static analysis frequently performed
 		+ [JSHint](http://www.jshint.com/)
 		+ [Google Closure Compiler](http://closure-compiler.appspot.com/)
