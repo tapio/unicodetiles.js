@@ -48,7 +48,7 @@ License
 
 Deja Vu fonts &copy; Bitstream. See the license at [http://dejavu-fonts.org/wiki/License](http://dejavu-fonts.org/wiki/License) for more information.
 
-The actual code and all other things are licensed as follows:
+The actual code and all other things are licensed under the [MIT license](http://opensource.org/licenses/MIT), which is as follows:
 
 Copyright (c) 2012 Tapio Vierros
 	
