@@ -1,5 +1,5 @@
 General:
 	* Test IE compatibility
-	* Add .eot webfont for IE9+
+	* Test netbook / crappy HW performance compatibility
 Engine:
 	* When possible, move tiles instead of calling tileFunc
