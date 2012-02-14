@@ -5,7 +5,7 @@ function hasLOS(startx, starty, targetx, targety) {
 	var dx = distx / maxdist, dy = disty / maxdist;
 	var xx = startx, yy = starty;
 	for (var i = 0; i < maxdist; ++i) {
-		if (eng.getTile(xx,yy).getChar() !== ".")
+		if (eng.getTile(Math.round(xx),Math.round(yy)).getChar() !== ".")
 			return false;
 		xx += dx; yy += dy;
 	}
