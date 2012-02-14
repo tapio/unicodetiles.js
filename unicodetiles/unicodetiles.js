@@ -221,37 +221,78 @@ var ut = {
 	/// The tile engine itself.
 
 	/// Constructor: Engine
-	/// Constructs a new Engine object.
+	/// Constructs a new Engine object. For the Engine to be functional,
+	/// either <setTileFunc> or <setTileArray> must also be called.
 	///
 	/// Parameters:
 	///   win - the ut.Window instance to use as the viewport
-	///   tileFunc - the function used for fetching tiles
-	Engine: function(win, tileFunc) {
+	Engine: function(win) {
 		"use strict";
 		this.window = win;
-		this.tileFunc = tileFunc;
+
+		/// Function: setTileArray
+		/// Sets the array that is used for reading the tiles.
+		/// The array must two dimensional (Array of Arrays) containing ut.Tile objects.
+		/// This will also undefine the tile function.
+		///
+		/// Parameters:
+		///   arr - the Array of Arrays of ut.Tile
+		this.setTileArray = function(arr) { this.tileArray = arr; this.tileFunc = undefined; };
 
 		/// Function: setTileFunc
 		/// Sets the function to be called to fetch each tile according to coordinates.
+		/// This will also undefine the tile array.
 		///
 		/// Parameters:
 		///   func - function taking parameters (x, y) and returning an ut.Tile
-		this.setTileFunc = function(func) { this.tileFunc = func; };
+		this.setTileFunc = function(func) { this.tileFunc = func; this.tileArray = undefined; };
+
+		/// Function: setMaskArray
+		/// Sets the array that is used for reading masking information.
+		/// The array must two dimensional (Array of Arrays) containing booleans (true or false).
+		/// If the mask array cell for some coordinates is false, then that tile is not rendered.
+		/// This will also undefine the mask function.
+		///
+		/// Parameters:
+		///   arr - the Array of Arrays of booleans
+		this.setMaskArray = function(arr) { this.maskArray = arr; this.maskFunc = undefined; };
 
 		/// Function: setMaskFunc
 		/// Sets the function to be called to fetch mask information according to coordinates.
 		/// If mask function returns false to some coordinates, then that tile is not rendered.
+		/// This will also undefine the mask array.
 		///
 		/// Parameters:
 		///   func - function taking parameters (x, y) and returning a true if the tile is visible
-		this.setMaskFunc = function(func) { this.maskFunc = func; };
+		this.setMaskFunc = function(func) { this.maskFunc = func; this.maskArray = undefined; };
 
 		/// Function: setShaderFunc
-		/// Sets the function to be called to psot process / shade each visible tile.
+		/// Sets the function to be called to post process / shade each visible tile.
 		///
 		/// Parameters:
 		///   func - function taking parameters (tile, x, y) and returning an ut.Tile
 		this.setShaderFunc = function(func) { this.shaderFunc = func; };
+
+		/// Function: testMask
+		/// Returns true if the tile at the given coordinates shoudl be displayed.
+		/// This means that either mask array or mask function have returned true, or neither exists.
+		this.testMask = function(x, y) {
+			if (!this.maskArray) {
+				if (!this.maskFunc) return true;
+				else return this.maskFunc(x, y);
+			} else return this.maskArray[y][x];
+		};
+
+		/// Function: getTile
+		/// Returns a tile from the tile array at the given coordinates.
+		/// If tile array has not been set, uses the tile function.
+		/// If neither is set, throws an error.
+		this.getTile = function(x, y) {
+			if (!this.tileArray) {
+				if (!this.tileFunc) throw "No tile array or function set.";
+				else return this.tileFunc(x, y);
+			} else return this.tileArray[y][x];
+		};
 
 		/// Function: render
 		/// Updates the window according to the given player coordinates.
@@ -263,8 +304,8 @@ var ut = {
 			var timeNow = new Date().getTime();
 			for (var j = 0; j < this.window.h; ++j) {
 				for (var i = 0; i < this.window.w; ++i) {
-					if (!this.maskFunc || this.maskFunc(i+xx, j+yy)) {
-						var tile = this.tileFunc(i+xx,j+yy);
+					if (this.testMask(i+xx, j+yy)) {
+						var tile = this.getTile(i+xx,j+yy);
 						if (this.shaderFunc)
 							tile = this.shaderFunc(tile, i+xx, j+yy, timeNow);
 						this.window.unsafePut(tile, i, j);
