@@ -14,17 +14,24 @@
 	<script type="text/javascript" src="fov.js"></script>
 	<script type="text/javascript">
 		// Poor pseudo random number generator
-		var A = 2971215073, B = 479001599, M = 1048576;
+		var A = 2971215073, B = 479001599, M = 1048573;
 		function rand(x, y) {
 			var num = ((A*x)^(B*y)) % M;
 			return num / M;
 		}
 
-		// Uses deterministic randomness to return a tile
+		var GRASS = new ut.Tile(".", 80, 150, 80);
+		var GRASS2 = new ut.Tile(".", 90, 250, 90);
+		var TREE = new ut.Tile("☘", 20, 100, 20);
+		var ROCK = new ut.Tile("☁", 100, 100, 100);
+
+		// Uses deterministic randomness to return a tile based on the coordinates
 		function getForestTile(x, y) {
 			var r = rand(Math.round(x), Math.round(y));
-			if (r > 0.80) return new ut.Tile("☘", 20, 100, 20);
-			return new ut.Tile(".", 80, 200, 80);
+			if (r > 0.80) return TREE;
+			if (r > 0.75) return ROCK;
+			if (r > 0.50) return GRASS2;
+			return GRASS;
 		}
 
 		// Initializes the forest

@@ -33,6 +33,7 @@ var map = [
 	"##############################"
 ];
 
+var AT = new ut.Tile("@", 255, 255, 255);
 var WALL = new ut.Tile('#', 100, 100, 100);
 var FLOOR = new ut.Tile('.', 50, 50, 50);
 
@@ -68,6 +69,6 @@ function handleKeys() {
 function tick() {
 	handleKeys(); // Input
 	eng.update(pl.x, pl.y); // Update tiles
-	term.put(new ut.Tile("@", 255, 255, 255), term.cx, term.cy); // Player character
+	term.put(AT, term.cx, term.cy); // Player character
 	term.render(); // Render
 }
