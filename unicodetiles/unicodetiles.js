@@ -1,5 +1,7 @@
 /// File: unicodetiles.js
 /// This file contains the main tile engine namespace.
+/// All coordinates are assumed to be integers - behaviour is undefined
+/// if you feed in floats (or anything other) as x and y (or similar) parameters.
 
 /*jshint trailing:true latedef:true */
 /*global document:true */
@@ -149,11 +151,9 @@ ut.Viewport = function(elem, w, h) {
 	///
 	/// Parameters:
 	///   tile - the tile to put
-	///   x - x coordinate
-	///   y - y coordinate
+	///   x - (integer) x coordinate
+	///   y - (integer) y coordinate
 	ut.Viewport.prototype.put = function(tile, x, y) {
-		x = Math.round(x);
-		y = Math.round(y);
 		if (x < 0 || y < 0 || x >= this.w || y >= this.h) return;
 		this.buffer[y][x] = tile;
 	};
@@ -164,8 +164,8 @@ ut.Viewport = function(elem, w, h) {
 	///
 	/// Parameters:
 	///   tile - the tile to put
-	///   x - x coordinate
-	///   y - y coordinate
+	///   x - (integer) x coordinate
+	///   y - (integer) y coordinate
 	ut.Viewport.prototype.unsafePut = function(tile, x, y) {
 		this.buffer[y][x] = tile;
 	};
@@ -175,14 +175,12 @@ ut.Viewport = function(elem, w, h) {
 	/// Checks bounds and returns empty tile if invalid coordinates are given.
 	///
 	/// Parameters:
-	///   x - x coordinate
-	///   y - y coordinate
+	///   x - (integer) x coordinate
+	///   y - (integer) y coordinate
 	///
 	/// Returns:
 	///   The tile.
 	ut.Viewport.prototype.get = function(x, y) {
-		x = Math.round(x);
-		y = Math.round(y);
 		if (x < 0 || y < 0 || x >= this.w || y >= this.h) return ut.NULLTILE;
 		return this.buffer[y][x];
 	};
@@ -300,8 +298,20 @@ ut.Engine = function(win) {
 		} else return this.tileArray[y][x];
 	};
 
-	/// Function: render
-	/// Updates the window according to the given player coordinates.
+	/// Function: update
+	/// Updates the viewport according to the given player coordinates.
+	/// The algorithm goes as follows:
+	///   * Record the current time
+	///   * For each viewport tile:
+	///   * Check if the tile is visible by testing the mask
+	///   * If not visible, continue to the next tile in the viewport
+	///   * Otherwise, fetch the tile and check for shader function presence
+	///   * If there is shader function, apply it to the tile, passing the recorded time
+	///   * Put the tile to viewport
+	///
+	/// Parameters:
+	///   x - (integer) viewport center x coordinate in the tile world
+	///   y - (integer) viewport center y coordinate in the tile world
 	ut.Engine.prototype.update = function(x, y) {
 		x = x || 0;
 		y = y || 0;
