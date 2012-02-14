@@ -228,10 +228,10 @@ ut.Viewport = function(elem, w, h) {
 /// either <setTileFunc> or <setTileArray> must also be called.
 ///
 /// Parameters:
-///   win - the ut.Window instance to use as the viewport
-ut.Engine = function(win) {
+///   vp - the ut.Viewport instance to use as the viewport
+ut.Engine = function(vp) {
 	"use strict";
-	this.window = win;
+	this.viewport = vp;
 };
 
 	/// Function: setTileArray
@@ -315,17 +315,17 @@ ut.Engine = function(win) {
 	ut.Engine.prototype.update = function(x, y) {
 		x = x || 0;
 		y = y || 0;
-		var xx = x - this.window.cx;
-		var yy = y - this.window.cy;
+		var xx = x - this.viewport.cx;
+		var yy = y - this.viewport.cy;
 		var timeNow = new Date().getTime();
-		for (var j = 0; j < this.window.h; ++j) {
-			for (var i = 0; i < this.window.w; ++i) {
+		for (var j = 0; j < this.viewport.h; ++j) {
+			for (var i = 0; i < this.viewport.w; ++i) {
 				if (this.testMask(i+xx, j+yy)) {
 					var tile = this.getTile(i+xx,j+yy);
 					if (this.shaderFunc)
 						tile = this.shaderFunc(tile, i+xx, j+yy, timeNow);
-					this.window.unsafePut(tile, i, j);
-				} else this.window.unsafePut(ut.NULLTILE, i, j);
+					this.viewport.unsafePut(tile, i, j);
+				} else this.viewport.unsafePut(ut.NULLTILE, i, j);
 			}
 		}
 	};
