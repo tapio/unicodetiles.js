@@ -51,8 +51,7 @@ function getDungeonTile(x, y) {
 function initSimpleDungeon() {
 	window.setInterval("tick()", 150);
 	term = new ut.Viewport(document.getElementById("game"), 41, 29);
-	eng = new ut.Engine(term);
-	eng.setTileFunc(getDungeonTile);
+	eng = new ut.Engine(term, getDungeonTile);
 }
 
 // Simple movement with arrows and collision detection
@@ -62,7 +61,7 @@ function handleKeys() {
 	if (pressedKeys[KEY_RIGHT] || pressedKeys[KEY_L]) pl.x++;
 	if (pressedKeys[KEY_UP]    || pressedKeys[KEY_K]) pl.y--;
 	if (pressedKeys[KEY_DOWN]  || pressedKeys[KEY_J]) pl.y++;
-	if (eng.getTile(pl.x, pl.y).getChar() !== '.') { pl.x = oldx; pl.y = oldy; }
+	if (eng.tileFunc(pl.x, pl.y).getChar() !== '.') { pl.x = oldx; pl.y = oldy; }
 }
 
 // "Main loop"

@@ -23,8 +23,7 @@
 		// Called after HTML is loaded, initializes UnicodeTiles etc.
 		function start() {
 			term = new ut.Viewport(document.getElementById("game"), 51, 25);
-			eng = new ut.Engine(term);
-			eng.setTileFunc(randomTile);
+			eng = new ut.Engine(term, randomTile);
 			window.setInterval("tick()", 150);
 		}
 
