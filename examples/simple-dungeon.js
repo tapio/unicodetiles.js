@@ -51,7 +51,7 @@ function getDungeonTile(x, y) {
 function initSimpleDungeon() {
 	window.setInterval("tick()", 150);
 	term = new ut.Viewport(document.getElementById("game"), 41, 29);
-	eng = new ut.Engine(term, getDungeonTile);
+	eng = new ut.Engine(term, getDungeonTile, map[0].length, map.length);
 }
 
 // Simple movement with arrows and collision detection

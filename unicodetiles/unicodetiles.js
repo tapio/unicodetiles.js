@@ -107,8 +107,8 @@ ut.NULLTILE = new ut.Tile();
 ///
 /// Parameters:
 ///   elem - the DOM element which shall be transformed into the tile engine
-///   w - width in tiles
-///   h - height in tiles
+///   w - (integer) width in tiles
+///   h - (integer) height in tiles
 ut.Viewport = function(elem, w, h) {
 	"use strict";
 	this.elem = elem;
@@ -227,15 +227,22 @@ ut.Viewport = function(elem, w, h) {
 /// The tile engine itself.
 
 /// Constructor: Engine
-/// Constructs a new Engine object.
+/// Constructs a new Engine object. If width or height is given,
+/// it will not attempt to fetch tiles outside the boundaries.
+/// In that case 0,0 is assumed as the upper-left corner of the world,
+/// but if no width/height is given also negative coords are valid.
 ///
 /// Parameters:
 ///   vp - the ut.Viewport instance to use as the viewport
 ///   func - the function used for fetching tiles
-ut.Engine = function(vp, func) {
+///   w - (integer) (optional) world width in tiles
+///   h - (integer) (optional) world height in tiles
+ut.Engine = function(vp, func, w, h) {
 	"use strict";
 	this.viewport = vp;
 	this.tileFunc = func;
+	this.w = w;
+	this.h = h;
 };
 
 	/// Function: setTileFunc
@@ -282,10 +289,18 @@ ut.Engine = function(vp, func) {
 		var timeNow = new Date().getTime();
 		for (var j = 0; j < this.viewport.h; ++j) {
 			for (var i = 0; i < this.viewport.w; ++i) {
-				if (!this.maskFunc || this.maskFunc(i+xx, j+yy)) {
-					var tile = this.tileFunc(i+xx,j+yy);
+				var ixx = i+xx, jyy = j+yy;
+				// Check horizontal bounds if requested
+				if (this.w && (ixx < 0 || ixx >= this.w)) {
+					this.viewport.unsafePut(ut.NULLTILE, i, j);
+				// Check vertical bounds if requested
+				} else if (this.h && (jyy < 0 || jyy >= this.w)) {
+					this.viewport.unsafePut(ut.NULLTILE, i, j);
+				// Check mask
+				} else if (!this.maskFunc || this.maskFunc(ixx, jyy)) {
+					var tile = this.tileFunc(ixx,jyy);
 					if (this.shaderFunc)
-						tile = this.shaderFunc(tile, i+xx, j+yy, timeNow);
+						tile = this.shaderFunc(tile, ixx, jyy, timeNow);
 					this.viewport.unsafePut(tile, i, j);
 				} else this.viewport.unsafePut(ut.NULLTILE, i, j);
 			}

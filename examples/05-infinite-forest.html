@@ -36,7 +36,12 @@
 
 		// Initializes the forest
 		function initForest() {
+			// Eng is already constructed by initSimpleDungeon(),
+			// so we swap the tile function to the new one here
 			eng.setTileFunc(getForestTile);
+			// We want infinite world so we set the size to undefined
+			eng.w = undefined;
+			eng.h = undefined;
 		}
 	</script>
 </head>
