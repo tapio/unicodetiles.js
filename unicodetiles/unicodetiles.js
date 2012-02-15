@@ -295,7 +295,8 @@ ut.Engine = function(vp, func, w, h) {
 	///   * For each viewport tile:
 	///   * Check if the tile is visible by testing the mask
 	///   * If not visible, continue to the next tile in the viewport
-	///   * Otherwise, fetch the tile and check for shader function presence
+	///   * Otherwise, if cache is enabled try to fetch the tile from there
+	///   * Otherwise, call the tile function and check for shader function presence
 	///   * If there is shader function, apply it to the tile, passing the recorded time
 	///   * Put the tile to viewport
 	///

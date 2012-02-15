@@ -27,21 +27,30 @@
 			return a*f + b*(1.0-f);
 		}
 
-		// Shades the tile according to distance from player
+		// Shades the tile according to distance from player,
+		// giving a kind of torch effect
 		function doLighting(tile, x, y, time) {
+			// Calculate a pulsating animation value from the time
 			var anim = time / 1000.0;
 			anim = Math.abs(anim - Math.floor(anim) - 0.5) + 0.5;
 			var d = distance(pl.x, pl.y, x, y);
+			// No shading if the tile is too far away from the player's "torch"
 			if (d >= MAX_DIST) return tile;
+			// We will create a new instance of ut.Tile because the tile
+			// passed in might be (and in this case is) a reference to
+			// a shared "constant" tile and we don't want the shader to
+			// affect all the places where that might be referenced
 			var shaded = new ut.Tile(tile.getChar());
+			// Calculate a blending factor between light and tile colors
 			var f = (1.0 - (d / MAX_DIST)) * LIGHT_INTENSITY * anim;
+			// Do the blending
 			shaded.r = Math.round(blend(LIGHT_COLOR.r, tile.r, f));
 			shaded.g = Math.round(blend(LIGHT_COLOR.g, tile.g, f));
 			shaded.b = Math.round(blend(LIGHT_COLOR.b, tile.b, f));
 			return shaded;
 		}
 
-		// Initializes the lighting shader
+		// Attaches the lighting shader
 		function initLighting() {
 			eng.setShaderFunc(doLighting);
 		}

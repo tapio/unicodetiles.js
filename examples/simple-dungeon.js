@@ -1,5 +1,5 @@
 var term, eng; // Can't be initialized yet because DOM is not ready
-var pl = { x: 3, y: 2 };
+var pl = { x: 3, y: 2 }; // Player position
 var map = [
 	"##############################",
 	"##   ###############   #######",
@@ -33,11 +33,13 @@ var map = [
 	"##############################"
 ];
 
+// The tile palette is precomputed in order to not have to create
+// thousands of Tiles on the fly.
 var AT = new ut.Tile("@", 255, 255, 255);
 var WALL = new ut.Tile('#', 100, 100, 100);
 var FLOOR = new ut.Tile('.', 50, 50, 50);
 
-// Returns a Tile from the char array map
+// Returns a Tile based on the char array map
 function getDungeonTile(x, y) {
 	var t = "";
 	try { t = map[y][x]; }
@@ -50,7 +52,9 @@ function getDungeonTile(x, y) {
 // Initialize stuff
 function initSimpleDungeon() {
 	window.setInterval("tick()", 150);
+	// Initialize Viewport, i.e. the place where the characters are displayed
 	term = new ut.Viewport(document.getElementById("game"), 41, 29);
+	// Initialize Engine, i.e. the Tile manager
 	eng = new ut.Engine(term, getDungeonTile, map[0].length, map.length);
 }
 
