@@ -243,6 +243,16 @@ ut.Engine = function(vp, func, w, h) {
 	this.tileFunc = func;
 	this.w = w;
 	this.h = h;
+	this.refreshCache = true;
+	this.cacheEnabled = false;
+	this.cachex = 0;
+	this.cachey = 0;
+	this.tileCache = new Array(vp.h);
+	this.tileCache2 = new Array(vp.h);
+	for (var j = 0; j < vp.h; ++j) {
+		this.tileCache[j] = new Array(vp.w);
+		this.tileCache2[j] = new Array(vp.w);
+	}
 };
 
 	/// Function: setTileFunc
@@ -267,6 +277,17 @@ ut.Engine = function(vp, func, w, h) {
 	///   func - function taking parameters (tile, x, y) and returning an ut.Tile
 	ut.Engine.prototype.setShaderFunc = function(func) { this.shaderFunc = func; };
 
+	/// Function: setCacheEnabled
+	/// Enables or disables the usage of tile cache. This means that
+	/// extra measures are taken to not call the tile function unncessarily.
+	/// This means that all animating must be done in a shader function.
+	/// Cache is off by default, but should be enabled if the tile function
+	/// does more computation than a simple array look-up.
+	///
+	/// Parameters:
+	///   mode - true to enable, false to disable
+	ut.Engine.prototype.setCacheEnabled = function(mode) { this.cacheEnabled = mode; this.refreshCache = true; };
+
 	/// Function: update
 	/// Updates the viewport according to the given player coordinates.
 	/// The algorithm goes as follows:
@@ -284,25 +305,52 @@ ut.Engine = function(vp, func, w, h) {
 	ut.Engine.prototype.update = function(x, y) {
 		x = x || 0;
 		y = y || 0;
+		// World coords of upper left corner of the viewport
 		var xx = x - this.viewport.cx;
 		var yy = y - this.viewport.cy;
-		var timeNow = new Date().getTime();
+		var timeNow = new Date().getTime(); // For passing to shaderFunc
+		var tile;
+		// For each tile in viewport...
 		for (var j = 0; j < this.viewport.h; ++j) {
 			for (var i = 0; i < this.viewport.w; ++i) {
 				var ixx = i+xx, jyy = j+yy;
 				// Check horizontal bounds if requested
 				if (this.w && (ixx < 0 || ixx >= this.w)) {
-					this.viewport.unsafePut(ut.NULLTILE, i, j);
+					tile = ut.NULLTILE;
 				// Check vertical bounds if requested
 				} else if (this.h && (jyy < 0 || jyy >= this.w)) {
-					this.viewport.unsafePut(ut.NULLTILE, i, j);
+					tile = ut.NULLTILE;
 				// Check mask
-				} else if (!this.maskFunc || this.maskFunc(ixx, jyy)) {
-					var tile = this.tileFunc(ixx,jyy);
-					if (this.shaderFunc)
-						tile = this.shaderFunc(tile, ixx, jyy, timeNow);
-					this.viewport.unsafePut(tile, i, j);
-				} else this.viewport.unsafePut(ut.NULLTILE, i, j);
+				} else if (this.maskFunc && !this.maskFunc(ixx, jyy)) {
+					tile = ut.NULLTILE;
+				// Check cache
+				} else if (this.cacheEnabled && !this.refreshCache) {
+					var lookupx = ixx - this.cachex;
+					var lookupy = jyy - this.cachey;
+					if (lookupx >= 0 && lookupx < this.viewport.w && lookupy >= 0 && lookupy < this.viewport.h) {
+						tile = this.tileCache[lookupy][lookupx];
+						if (tile === ut.NULLTILE) tile = this.tileFunc(ixx, jyy);
+					} else // Cache miss
+						tile = this.tileFunc(ixx, jyy);
+				// If all else fails, call tileFunc
+				} else tile = this.tileFunc(ixx, jyy);
+				// Save the tile to cache
+				if (this.cacheEnabled) this.tileCache2[j][i] = tile;
+				// Apply shader function
+				if (this.shaderFunc && tile !== ut.NULLTILE)
+					tile = this.shaderFunc(tile, ixx, jyy, timeNow);
+				// Put shaded tile to viewport
+				this.viewport.unsafePut(tile, i, j);
 			}
+		}
+		if (this.cacheEnabled) {
+			// Save the new cache origin
+			this.cachex = xx;
+			this.cachey = yy;
+			// Swap cache buffers
+			var tempCache = this.tileCache;
+			this.tileCache = this.tileCache2;
+			this.tileCache2 = tempCache;
+			this.refreshCache = false;
 		}
 	};

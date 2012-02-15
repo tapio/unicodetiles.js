@@ -1,5 +1,4 @@
 General:
 	* Test IE compatibility
-	* Test netbook / crappy HW performance compatibility
 Engine:
-	* When possible, move tiles instead of calling tileFunc
+	* Test & profile tile cache
