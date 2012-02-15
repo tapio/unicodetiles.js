@@ -128,9 +128,11 @@ ut.Viewport = function(elem, w, h) {
 	// Create two 2-dimensional arrays to hold the viewport tiles and <span> elements
 	this.buffer = new Array(h);
 	this.spans = new Array(h);
+	this.colors = new Array(h);
 	for (j = 0; j < h; ++j) {
 		this.buffer[j] = new Array(w);
 		this.spans[j] = new Array(w);
+		this.colors[j] = new Array(w);
 	}
 
 	// Create a matrix of <span> elements, cache references
@@ -188,9 +190,12 @@ ut.Viewport = function(elem, w, h) {
 	/// Function: clear
 	/// Clears the viewport buffer by assigning empty tiles.
 	ut.Viewport.prototype.clear = function() {
-		for (var j = 0; j < this.h; ++j)
-			for (var i = 0; i < this.w; ++i)
+		for (var j = 0; j < this.h; ++j) {
+			for (var i = 0; i < this.w; ++i) {
 				this.buffer[j][i] = ut.NULLTILE;
+				this.colors[j][i] = "";
+			}
+		}
 	};
 
 	/// Function: render
@@ -201,13 +206,11 @@ ut.Viewport = function(elem, w, h) {
 				var tile = this.buffer[j][i];
 				var span = this.spans[j][i];
 				// Check and update colors
-				// We use "data-" attributes for storing color info,
-				// so that we have a consistent format for it.
 				var fg = tile.getColorRGB();
 				var bg = tile.getBackgroundRGB();
-				if (fg !== span.getAttribute("data-fg") || bg !== span.getAttribute("data-bg")) {
-					span.setAttribute("data-fg", fg);
-					span.setAttribute("data-bg", bg);
+				var colorHash = fg + bg;
+				if (colorHash !== this.colors[j][i]) {
+					this.colors[j][i] = colorHash;
 					span.style.color = fg;
 					span.style.backgroundColor = bg;
 				}
