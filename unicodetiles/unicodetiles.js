@@ -7,7 +7,7 @@
 /*global document:true */
 
 /// Namespace: ut
-/// The tile engine classses etc. are wrapped inside this.
+/// Container namespace.
 var ut = ut || {};
 
 /// Constants: Semi-internal constants for ut namespace

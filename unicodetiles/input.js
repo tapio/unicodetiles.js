@@ -1,7 +1,8 @@
 /// File: input.js
-/// This file contains some input helpers, such as key code constants.
-/// It also exposes a <pressedKeys> variable.
+/// This file contains a very simple input system.
 
+/// Namespace: ut
+/// Container namespace.
 var ut = ut || {};
 
 /// Constants: Keycodes
@@ -78,31 +79,47 @@ ut.KEY_X = 88;
 ut.KEY_Y = 89;
 ut.KEY_Z = 90;
 
-/// Variable: pressedKeys
-/// A dictionary of key codes that are currently being pressed down.
 ut.pressedKeys = {};
 
-/// Function: handleKeyDown
-/// A key handler that updates <pressedKeys>.
-/// *Bound automatically to document.onkeydown event.*
-ut.handleKeyDown = function(event) {
+/// Function: isKeyDown
+/// Checks if given key is pressed down. You must call <ut.initInput> first.
+///
+/// Parameters:
+///   key - key code to check
+///
+/// Returns:
+///    True if the key is pressed down, false otherwise.
+ut.isKeyDown = function(key) {
 	"use strict";
-	var k = event.keyCode;
-	ut.pressedKeys[k] = true;
-
-	if (ut.pressedKeys[ut.KEY_CTRL]) return true;
+	if (ut.pressedKeys[key]) return true;
 	else return false;
 };
 
-/// Function: handleKeyUp
-/// A key handler that updates <pressedKeys>.
-/// *Bound automatically to document.onkeyup event.*
-ut.handleKeyUp = function(event) {
-	"use strict";
-	ut.pressedKeys[event.keyCode] = false;
-	return false;
+/// Function: initInput
+/// Initilizes input by assigning default handlers and optional user's handlers.
+/// This must be called in order to <ut.isKeyDown> to work.
+///
+/// Parameters:
+///   onkeydown - (optional) function(event) for key down event handler
+///   onkeyup - (optional) function(event) for key up event handler
+ut.initInput = function(onKeyDown, onKeyUp) {
+	ut.onkeydown = onKeyDown;
+	ut.onkeyup = onKeyUp;
+	// Attach default onkeydown handler that updates pressedKeys
+	document.onkeydown = function(event) {
+		"use strict";
+		var k = event.keyCode;
+		ut.pressedKeys[k] = true;
+		if (ut.onkeydown) ut.onkeydown(event); // User event handler
+		if (ut.pressedKeys[ut.KEY_CTRL]) return true; // CTRL for browser hotkeys
+		else return false;
+	};
+	// Attach default onkeyup handler that updates pressedKeys
+	document.onkeyup = function(event) {
+		"use strict";
+		ut.pressedKeys[event.keyCode] = false;
+		if (ut.onkeyup) ut.onkeyup(event); // User event handler
+		return false;
+	};
 };
 
-
-document.onkeydown = ut.handleKeyDown;
-document.onkeyup = ut.handleKeyUp;

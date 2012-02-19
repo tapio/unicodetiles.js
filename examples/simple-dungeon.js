@@ -56,15 +56,17 @@ function initSimpleDungeon() {
 	term = new ut.Viewport(document.getElementById("game"), 41, 29);
 	// Initialize Engine, i.e. the Tile manager
 	eng = new ut.Engine(term, getDungeonTile, map[0].length, map.length);
+	// Initialize input
+	ut.initInput();
 }
 
 // Simple movement with arrows and collision detection
 function handleKeys() {
 	var oldx = pl.x, oldy = pl.y;
-	if (ut.pressedKeys[ut.KEY_LEFT]  || ut.pressedKeys[ut.KEY_H]) pl.x--;
-	if (ut.pressedKeys[ut.KEY_RIGHT] || ut.pressedKeys[ut.KEY_L]) pl.x++;
-	if (ut.pressedKeys[ut.KEY_UP]    || ut.pressedKeys[ut.KEY_K]) pl.y--;
-	if (ut.pressedKeys[ut.KEY_DOWN]  || ut.pressedKeys[ut.KEY_J]) pl.y++;
+	if (ut.isKeyDown(ut.KEY_LEFT)  || ut.isKeyDown(ut.KEY_H)) pl.x--;
+	if (ut.isKeyDown(ut.KEY_RIGHT) || ut.isKeyDown(ut.KEY_L)) pl.x++;
+	if (ut.isKeyDown(ut.KEY_UP)    || ut.isKeyDown(ut.KEY_K)) pl.y--;
+	if (ut.isKeyDown(ut.KEY_DOWN)  || ut.isKeyDown(ut.KEY_J)) pl.y++;
 	if (eng.tileFunc(pl.x, pl.y).getChar() !== '.') { pl.x = oldx; pl.y = oldy; }
 }
 
