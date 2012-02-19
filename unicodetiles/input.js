@@ -81,7 +81,7 @@ ut.KEY_Z = 90;
 
 ut.pressedKeys = {};
 
-/// Function: isKeyDown
+/// Function: isKeyPressed
 /// Checks if given key is pressed down. You must call <ut.initInput> first.
 ///
 /// Parameters:
@@ -89,7 +89,7 @@ ut.pressedKeys = {};
 ///
 /// Returns:
 ///    True if the key is pressed down, false otherwise.
-ut.isKeyDown = function(key) {
+ut.isKeyPressed = function(key) {
 	"use strict";
 	if (ut.pressedKeys[key]) return true;
 	else return false;
@@ -97,7 +97,7 @@ ut.isKeyDown = function(key) {
 
 /// Function: initInput
 /// Initilizes input by assigning default handlers and optional user's handlers.
-/// This must be called in order to <ut.isKeyDown> to work.
+/// This must be called in order to <ut.isKeyPressed> to work.
 ///
 /// Parameters:
 ///   onkeydown - (optional) function(event) for key down event handler
