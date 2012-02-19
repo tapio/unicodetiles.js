@@ -8,18 +8,15 @@
 
 /// Namespace: ut
 /// The tile engine classses etc. are wrapped inside this.
-var ut = {
+var ut = ut || {};
 
-	/// Constants: Semi-internal constants for ut namespace
-	/// NULLCHAR - Character used when none is specified otherwise.
-	/// CSSCLASS - The CSS class name used for the tile engine element.
-	/// NULLTILE - The tile used as placeholder for empty tile.
-	NULLCHAR: " ",
-	CSSCLASS: "unicodetiles",
-	NULLTILE: {} // Initialized properly after the namespace
-
-};
-
+/// Constants: Semi-internal constants for ut namespace
+/// NULLCHAR - Character used when none is specified otherwise.
+/// CSSCLASS - The CSS class name used for the tile engine element.
+/// NULLTILE - The tile used as placeholder for empty tile.
+ut.NULLCHAR = " ";
+ut.CSSCLASS = "unicodetiles";
+ut.NULLTILE = {}; // Initialized properly after the namespace
 
 /// Class: Tile
 /// Represents a unicode character tile with various attributes.

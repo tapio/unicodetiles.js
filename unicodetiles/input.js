@@ -2,6 +2,8 @@
 /// This file contains some input helpers, such as key code constants.
 /// It also exposes a <pressedKeys> variable.
 
+var ut = ut || {};
+
 /// Constants: Keycodes
 /// KEY_ENTER - 13
 /// KEY_SHIFT - 16
@@ -39,67 +41,68 @@
 /// KEY_Y - 89
 /// KEY_Z - 90
 
-var KEY_ENTER = 13;
-var KEY_SHIFT = 16;
-var KEY_CTRL = 17;
-var KEY_ALT = 18;
-var KEY_SPACE = 32;
-var KEY_LEFT = 37;
-var KEY_UP = 38;
-var KEY_RIGHT = 39;
-var KEY_DOWN = 40;
+ut.KEY_ENTER = 13;
+ut.KEY_SHIFT = 16;
+ut.KEY_CTRL = 17;
+ut.KEY_ALT = 18;
+ut.KEY_SPACE = 32;
+ut.KEY_LEFT = 37;
+ut.KEY_UP = 38;
+ut.KEY_RIGHT = 39;
+ut.KEY_DOWN = 40;
 
-var KEY_A = 65;
-var KEY_B = 66;
-var KEY_C = 67;
-var KEY_D = 68;
-var KEY_E = 69;
-var KEY_F = 70;
-var KEY_G = 71;
-var KEY_H = 72;
-var KEY_I = 73;
-var KEY_J = 74;
-var KEY_K = 75;
-var KEY_L = 76;
-var KEY_M = 77;
-var KEY_N = 78;
-var KEY_O = 79;
-var KEY_P = 80;
-var KEY_Q = 81;
-var KEY_R = 82;
-var KEY_S = 83;
-var KEY_T = 84;
-var KEY_U = 85;
-var KEY_V = 86;
-var KEY_W = 87;
-var KEY_X = 88;
-var KEY_Y = 89;
-var KEY_Z = 90;
+ut.KEY_A = 65;
+ut.KEY_B = 66;
+ut.KEY_C = 67;
+ut.KEY_D = 68;
+ut.KEY_E = 69;
+ut.KEY_F = 70;
+ut.KEY_G = 71;
+ut.KEY_H = 72;
+ut.KEY_I = 73;
+ut.KEY_J = 74;
+ut.KEY_K = 75;
+ut.KEY_L = 76;
+ut.KEY_M = 77;
+ut.KEY_N = 78;
+ut.KEY_O = 79;
+ut.KEY_P = 80;
+ut.KEY_Q = 81;
+ut.KEY_R = 82;
+ut.KEY_S = 83;
+ut.KEY_T = 84;
+ut.KEY_U = 85;
+ut.KEY_V = 86;
+ut.KEY_W = 87;
+ut.KEY_X = 88;
+ut.KEY_Y = 89;
+ut.KEY_Z = 90;
 
 /// Variable: pressedKeys
 /// A dictionary of key codes that are currently being pressed down.
-var pressedKeys = {};
-
-document.onkeydown = handleKeyDown;
-document.onkeyup = handleKeyUp;
+ut.pressedKeys = {};
 
 /// Function: handleKeyDown
 /// A key handler that updates <pressedKeys>.
 /// *Bound automatically to document.onkeydown event.*
-function handleKeyDown(event) {
+ut.handleKeyDown = function(event) {
 	"use strict";
 	var k = event.keyCode;
-	pressedKeys[k] = true;
+	ut.pressedKeys[k] = true;
 
-	if (pressedKeys[KEY_CTRL]) return true;
+	if (ut.pressedKeys[ut.KEY_CTRL]) return true;
 	else return false;
-}
+};
 
 /// Function: handleKeyUp
 /// A key handler that updates <pressedKeys>.
 /// *Bound automatically to document.onkeyup event.*
-function handleKeyUp(event) {
+ut.handleKeyUp = function(event) {
 	"use strict";
-	pressedKeys[event.keyCode] = false;
+	ut.pressedKeys[event.keyCode] = false;
 	return false;
-}
+};
+
+
+document.onkeydown = ut.handleKeyDown;
+document.onkeyup = ut.handleKeyUp;
