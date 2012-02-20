@@ -15,8 +15,11 @@ Current features
 * Engine - _the tile engine_
 	- Viewport updating according to player coordinates
 	- Tile reading through a callback
+	- Optional caching for cases where the tile callback is heavy
 	- Masking callback (for FOV etc.)
 	- Shader callback (for animating tiles)
+* Input - _keyboard handling_
+	- Simple addon that makes keyboard managing easier
 * Meta - _General meta stuff_
 	- Comprehensive API documentation
 		+ Generated with Natural Docs from source code comments
