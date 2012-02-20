@@ -135,7 +135,7 @@ ut.Viewport = function(elem, w, h) {
 	// Create a matrix of <span> elements, cache references
 	for (j = 0; j < this.h; ++j) {
 		for (i = 0; i < this.w; ++i) {
-			this.spans[j][i] = document.createElement("span");
+			this.spans[j][i] = document.createElement("div");
 			this.elem.appendChild(this.spans[j][i]);
 		}
 		// Line break

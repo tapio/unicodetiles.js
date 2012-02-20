@@ -17,3 +17,9 @@
 	display: inline-block;
 	overflow: hidden;
 }
+
+.unicodetiles div {
+	float: left;
+	height: 0.95em;
+	overflow-y: hidden;
+}

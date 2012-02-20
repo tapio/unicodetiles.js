@@ -5,6 +5,4 @@ Engine:
 Viewport:
 	* setDefaultColor
 	* setDefaultBackground
-	* Background color is a bit b0rked due to CSS line-height
-	* CSS3 transform scaling?
 
