@@ -8,30 +8,22 @@
 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript">
-		var term, eng; // Can't be initialized yet because DOM is not ready
-		var chars = "☠☃⚙☻♞☭✈✟✂✯";
+		var term; // Can't be initialized yet because DOM is not ready
 
-		// Returns a random tile
-		function randomTile(x, y) {
-			var r = Math.floor(Math.random() * 255);
-			var g = Math.floor(Math.random() * 255);
-			var b = Math.floor(Math.random() * 255);
-			var c = Math.floor(Math.random() * chars.length);
-			return new ut.Tile(chars[c], r, g, b);
-		}
-
-		// Called after HTML is loaded, initializes UnicodeTiles etc.
+		// Called after HTML is loaded, initializes UnicodeTiles Viewport
+		// and displays something.
 		function start() {
-			term = new ut.Viewport(document.getElementById("game"), 51, 25);
-			eng = new ut.Engine(term, randomTile);
-			window.setInterval("tick()", 150);
-		}
+			term = new ut.Viewport(document.getElementById("game"), 45, 25);
 
-		// Called every now and then to update the screen
-		function tick() {
-			eng.update();
+			term.clear();
+
+			term.putString("Hello world!", 0,0, 0,255,0);
+			term.putString("Some unicode chars: ", 0,2, 128,0,0);
+			term.putString("☠☃⚙☻♞☭✈✟✂✯", 0,3, 0,0,255);
+
 			term.render();
 		}
+
 	</script> 
 </head>
 
