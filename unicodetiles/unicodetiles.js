@@ -26,9 +26,9 @@ ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 ///
 /// Parameters:
 ///   ch - a character to display for this tile
-///   r - (optional) red color component 0-255
-///   g - (optional) green color component 0-255
-///   b - (optional) blue color component 0-255
+///   r - (optional) red foregorund color component 0-255
+///   g - (optional) green foreground color component 0-255
+///   b - (optional) blue foreground color component 0-255
 ///   br - (optional) red background color component 0-255
 ///   bg - (optional) green background color component 0-255
 ///   bb - (optional) blue background color component 0-255
@@ -177,12 +177,12 @@ ut.Viewport = function(elem, w, h) {
 	///   str - (string) the string to put
 	///   x - (integer) x coordinate (column)
 	///   y - (integer) y coordinate (row)
-	///   r - (optional) (integer) red foreground color component
-	///   g - (optional) (integer) green foreground color component
-	///   b - (optional) (integer) blue foreground color component
-	///   br - (optional) (integer) red background color component
-	///   bg - (optional) (integer) green background color component
-	///   bb - (optional) (integer) blue background color component
+	///   r - (optional) red foregorund color component 0-255
+	///   g - (optional) green foreground color component 0-255
+	///   b - (optional) blue foreground color component 0-255
+	///   br - (optional) red background color component 0-255
+	///   bg - (optional) green background color component 0-255
+	///   bb - (optional) blue background color component 0-255
 	ut.Viewport.prototype.putString = function(str, x, y, r, g, b, br, bg, bb) {
 		var len = str.length;
 		var tile;
@@ -295,7 +295,8 @@ ut.Engine = function(vp, func, w, h) {
 	ut.Engine.prototype.setMaskFunc = function(func) { this.maskFunc = func; };
 
 	/// Function: setShaderFunc
-	/// Sets the function to be called to post process / shade each visible tile.
+	/// Sets the function to be called to post-process / shade each visible tile.
+	/// Shader function is called even if caching is enabled (see <setCacheEnabled>).
 	///
 	/// Parameters:
 	///   func - function taking parameters (tile, x, y) and returning an ut.Tile
@@ -303,8 +304,8 @@ ut.Engine = function(vp, func, w, h) {
 
 	/// Function: setCacheEnabled
 	/// Enables or disables the usage of tile cache. This means that
-	/// extra measures are taken to not call the tile function unncessarily.
-	/// This means that all animating must be done in a shader function.
+	/// extra measures are taken to not call the tile function unnecessarily.
+	/// This means that all animating must be done in a shader function (see <setShaderFunc>).
 	/// Cache is off by default, but should be enabled if the tile function
 	/// does more computation than a simple array look-up.
 	///
