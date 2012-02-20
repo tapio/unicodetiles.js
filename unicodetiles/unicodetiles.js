@@ -16,7 +16,7 @@ var ut = ut || {};
 /// NULLTILE - The tile used as placeholder for empty tile.
 ut.NULLCHAR = " ";
 ut.CSSCLASS = "unicodetiles";
-ut.NULLTILE = {}; // Initialized properly after the namespace
+ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 
 /// Class: Tile
 /// Represents a unicode character tile with various attributes.
@@ -167,6 +167,33 @@ ut.Viewport = function(elem, w, h) {
 	///   y - (integer) y coordinate
 	ut.Viewport.prototype.unsafePut = function(tile, x, y) {
 		this.buffer[y][x] = tile;
+	};
+
+	/// Function: putString
+	/// Creates a row of tiles with the chars of the given string.
+	/// Wraps to next line if it can't fit the chars on one line.
+	///
+	/// Parameters:
+	///   str - (string) the string to put
+	///   x - (integer) x coordinate (column)
+	///   y - (integer) y coordinate (row)
+	///   r - (optional) (integer) red foreground color component
+	///   g - (optional) (integer) green foreground color component
+	///   b - (optional) (integer) blue foreground color component
+	///   br - (optional) (integer) red background color component
+	///   bg - (optional) (integer) green background color component
+	///   bb - (optional) (integer) blue background color component
+	ut.Viewport.prototype.putString = function(str, x, y, r, g, b, br, bg, bb) {
+		var len = str.length;
+		var tile;
+		if (x < 0 || y < 0) return;
+		for (var i = 0; i < len; ++i) {
+			if (x >= term.w) { x = 0; ++y;}
+			if (y >= term.h) return;
+			tile = new ut.Tile(str[i], r, g, b, br, bg, bb);
+			this.unsafePut(tile, x, y);
+			++x;
+		}
 	};
 
 	/// Function: get
