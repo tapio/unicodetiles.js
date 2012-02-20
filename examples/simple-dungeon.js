@@ -1,5 +1,6 @@
 var term, eng; // Can't be initialized yet because DOM is not ready
 var pl = { x: 3, y: 2 }; // Player position
+var updateFOV; // For some of the examples
 var map = [
 	"##############################",
 	"##   ###############   #######",
@@ -73,6 +74,7 @@ function handleKeys() {
 // "Main loop"
 function tick() {
 	handleKeys(); // Input
+	if (updateFOV) updateFOV(pl.x, pl.y); // Update field of view (used in some examples)
 	eng.update(pl.x, pl.y); // Update tiles
 	term.put(AT, term.cx, term.cy); // Player character
 	term.render(); // Render

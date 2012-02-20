@@ -1,41 +1,57 @@
-// WARNING: The implementation of the FOV here is very poor.
-// It produces barely passable FOV and is very CPU intensive.
-// However it is simple and demonstrates how easy it is to use the
-// Engine's mask function capability.
+// This file contains an implementation of simple FOV.
+// It naïvely shoots a beam at every direction.
+// Makes use of the ut.Engine's mask function callback.
 
+var maskBuffer;
+var maskOrigin = { x: 0, y: 0 };
 
-function hasLOS(startx, starty, targetx, targety) {
-	// Calculate x and y components of the distance to target
-	var distx = targetx - startx, disty = targety - starty;
-	// Pick the greatest distance
-	var maxdist = Math.max(Math.abs(distx), Math.abs(disty));
-	// Create step amounts so that step along the longer axis is 1
-	var dx = distx / maxdist, dy = disty / maxdist;
-	var xx = startx, yy = starty;
-	// Iterate through the longer distance in steps of 1
+// Shoots a line-of-sight beam that marks tiles as visible as it goes
+function shootRay(x, y, a) {
+	var step = 0.3333;
+	var maxdist = term.cy / step;
+	var dx = Math.cos(a) * step;
+	var dy = -Math.sin(a) * step;
+	var xx = x, yy = y;
 	for (var i = 0; i < maxdist; ++i) {
 		// Check for walls at the current spot
-		if (eng.tileFunc(Math.round(xx),Math.round(yy)).getChar() !== ".")
-			return false;
+		var testx = Math.round(xx);
+		var testy = Math.round(yy);
+		// Mark the tile visible
+		maskBuffer[testy - maskOrigin.y][testx - maskOrigin.x] = true;
+		// If wall is encountered, terminate ray
+		if (eng.tileFunc(testx, testy).getChar() !== ".")
+			return;
 		// Advance the beam according to the step variables
 		xx += dx; yy += dy;
 	}
-	return true;
-}
-
-function calculateFOV(x, y) {
-	// Shoot a beam from the four corners of the player tile
-	// to the corresponding corners of the target tile
-	// in order to produce more permissive FOV than just one beam
-	var d = 0.3;
-	if (hasLOS(pl.x-d, pl.y-d, x-d, y-d)) return true;
-	if (hasLOS(pl.x+d, pl.y-d, x+d, y-d)) return true;
-	if (hasLOS(pl.x+d, pl.y+d, x+d, y+d)) return true;
-	if (hasLOS(pl.x-d, pl.y+d, x-d, y+d)) return true;
-	return false;
 }
 
 // Initializes the FOV
 function initFOV() {
-	eng.setMaskFunc(calculateFOV);
+	// Create an array for the FOV
+	maskBuffer = new Array(term.h);
+	for (var j = 0; j < term.h; ++j)
+		maskBuffer[j] = new Array(term.w);
+	// Attach the look-up callback
+	eng.setMaskFunc(function(x, y) {
+		x -= maskOrigin.x;
+		y -= maskOrigin.y;
+		if (x < 0 || y < 0 || x >= term.w || y >= term.h) return false;
+		return maskBuffer[y][x];
+	});
 }
+
+// Calculates a fresh field of view
+updateFOV = function(x, y) {
+	// Clear the mask buffer
+	for (var j = 0; j < term.h; ++j)
+		for (var i = 0; i < term.w; ++i)
+			maskBuffer[j][i] = false;
+	// Update buffer info
+	maskOrigin.x = x - term.cx;
+	maskOrigin.y = y - term.cy;
+	// Populate the mask buffer with fresh data
+	var step = Math.PI * 2.0 / 1080;
+	for (var a = 0; a < Math.PI * 2; a += step)
+		shootRay(x, y, a);
+};

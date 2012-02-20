@@ -2,3 +2,6 @@ General:
 	* Test IE compatibility
 Engine:
 	* Test & profile tile cache
+Viewport:
+	* putString
+
