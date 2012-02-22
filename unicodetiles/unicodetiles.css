@@ -23,3 +23,7 @@
 	height: 0.95em;
 	overflow-y: hidden;
 }
+
+.unicodetiles br {
+	clear: both;
+}
