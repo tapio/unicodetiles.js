@@ -20,15 +20,15 @@ Current features
 	- Shader callback (for animating tiles)
 * Input - _keyboard handling_
 	- Simple addon that makes keyboard managing easier
-* Meta - _General meta stuff_
+* Meta - _general stuff_
 	- Comprehensive API documentation
 		+ Generated with Natural Docs from source code comments
 	- Broad browser support
-		+ Tested with Firefox 10, Chromium 16, Google Chrome 18b, Opera 11.61 + 12.0a
-		+ IE9+ is not yet thoroughly tested, but will be supported
+		+ Best on latest Chrome and Firefox
+		+ IE9+ and Opera 11.61+ supported, but less frequently tested
 		+ IE8 and below are not targeted
 	- Static analysis frequently performed
-		+ [JSHint](http://www.jshint.com/)
+		+ [JSHint](http://www.jshint.com/) (on every git commit)
 		+ [Google Closure Compiler](http://closure-compiler.appspot.com/)
 	- Several examples / tutorials
 		+ See examples/ subfolder
