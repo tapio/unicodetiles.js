@@ -100,6 +100,7 @@ ut.NULLTILE = new ut.Tile();
 
 /// Constructor: Viewport
 /// Constructs a new Viewport object.
+/// If you wish to display a player character at the center, you should use odd sizes.
 ///
 /// Parameters:
 ///   elem - the DOM element which shall be transformed into the tile engine
