@@ -256,7 +256,7 @@ ut.Viewport = function(elem, w, h) {
 /// but if no width/height is given also negative coords are valid.
 ///
 /// Parameters:
-///   vp - the ut.Viewport instance to use as the viewport
+///   vp - the <Viewport> instance to use as the viewport
 ///   func - the function used for fetching tiles
 ///   w - (integer) (optional) world width in tiles
 ///   h - (integer) (optional) world height in tiles
@@ -295,7 +295,7 @@ ut.Engine = function(vp, func, w, h) {
 
 	/// Function: setShaderFunc
 	/// Sets the function to be called to post-process / shade each visible tile.
-	/// Shader function is called even if caching is enabled (see <setCacheEnabled>).
+	/// Shader function is called even if caching is enabled, see <Engine.setCacheEnabled>.
 	///
 	/// Parameters:
 	///   func - function taking parameters (tile, x, y) and returning an ut.Tile
@@ -304,7 +304,8 @@ ut.Engine = function(vp, func, w, h) {
 	/// Function: setCacheEnabled
 	/// Enables or disables the usage of tile cache. This means that
 	/// extra measures are taken to not call the tile function unnecessarily.
-	/// This means that all animating must be done in a shader function (see <setShaderFunc>).
+	/// This means that all animating must be done in a shader function,
+	/// see <Engine.setShaderFunc>.
 	/// Cache is off by default, but should be enabled if the tile function
 	/// does more computation than a simple array look-up.
 	///
