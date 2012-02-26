@@ -3,8 +3,7 @@
 /// All coordinates are assumed to be integers - behaviour is undefined
 /// if you feed in floats (or anything other) as x and y (or similar) parameters.
 
-/*jshint trailing:true latedef:true */
-/*global document:true */
+/*jshint browser:true trailing:true latedef:true */
 
 /// Namespace: ut
 /// Container namespace.

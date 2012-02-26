@@ -1,6 +1,8 @@
 /// File: input.js
 /// This file contains a very simple input system.
 
+/*jshint browser:true */
+
 /// Namespace: ut
 /// Container namespace.
 var ut = ut || {};
@@ -80,6 +82,7 @@ ut.KEY_Y = 89;
 ut.KEY_Z = 90;
 
 ut.pressedKeys = {};
+ut.keyRepeatDelay = 150;
 
 /// Function: isKeyPressed
 /// Checks if given key is pressed down. You must call <ut.initInput> first.
@@ -91,17 +94,28 @@ ut.pressedKeys = {};
 ///    True if the key is pressed down, false otherwise.
 ut.isKeyPressed = function(key) {
 	"use strict";
-	if (ut.pressedKeys[key]) return true;
+	if (ut.pressedKeys[key] !== null) return true;
 	else return false;
 };
 
+/// Function: setKeyRepeatInterval
+/// Sets the interval when user's onKeyDown handler (see <ut.initInput)
+/// is called when a key is held down.
+///
+/// Parameters:
+///   milliseconds - the interval delay in milliseconds (1 second = 1000 milliseconds)
+ut.setKeyRepeatInterval = function(milliseconds) {
+	"use strict";
+	ut.keyRepeatDelay = milliseconds;
+};
+
 /// Function: initInput
-/// Initilizes input by assigning default handlers and optional user's handlers.
+/// Initilizes input by assigning default key handlers and optional user's handlers.
 /// This must be called in order to <ut.isKeyPressed> to work.
 ///
 /// Parameters:
-///   onkeydown - (optional) function(event) for key down event handler
-///   onkeyup - (optional) function(event) for key up event handler
+///   onkeydown - (optional) function(keyCode) for key down event handler
+///   onkeyup - (optional) function(keyCode) for key up event handler
 ut.initInput = function(onKeyDown, onKeyUp) {
 	ut.onkeydown = onKeyDown;
 	ut.onkeyup = onKeyUp;
@@ -109,17 +123,33 @@ ut.initInput = function(onKeyDown, onKeyUp) {
 	document.onkeydown = function(event) {
 		"use strict";
 		var k = event.keyCode;
+		if (ut.pressedKeys[k] !== null && ut.pressedKeys[k] !== undefined) return false;
 		ut.pressedKeys[k] = true;
-		if (ut.onkeydown) ut.onkeydown(event); // User event handler
-		if (ut.pressedKeys[ut.KEY_CTRL]) return true; // CTRL for browser hotkeys
+		if (ut.onkeydown) {
+			ut.onkeydown(k); // User event handler
+			// Setup keyrepeat
+			ut.pressedKeys[k] = setInterval("ut.onkeydown("+k+")", ut.keyRepeatDelay);
+		}
+		if (ut.pressedKeys[ut.KEY_CTRL] !== null) return true; // CTRL for browser hotkeys
 		else return false;
 	};
 	// Attach default onkeyup handler that updates pressedKeys
 	document.onkeyup = function(event) {
 		"use strict";
-		ut.pressedKeys[event.keyCode] = false;
-		if (ut.onkeyup) ut.onkeyup(event); // User event handler
+		var k = event.keyCode;
+		if (ut.onkeydown && ut.pressedKeys[k] !== null && ut.pressedKeys[k] !== undefined)
+			clearInterval(ut.pressedKeys[k]);
+		ut.pressedKeys[k] = null;
+		if (ut.onkeyup) ut.onkeyup(k); // User event handler
 		return false;
+	};
+	// Avoid keys getting stuck at down
+	window.onblur = function() {
+		"use strict";
+		for (var k in ut.pressedKeys)
+			if (ut.onkeydown && ut.pressedKeys[k] !== null)
+				clearInterval(ut.pressedKeys[k]);
+		ut.pressedKeys = {};
 	};
 };
 
