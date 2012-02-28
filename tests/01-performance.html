@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Performance Test</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="../examples/style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript">
+		var chars = "☠☃⚙☻♞☭✈✟✂✯";
+		var term, eng; // Can't be initialized yet because DOM is not ready
+		var interval1, interval2;
+		var start_time;
+		var iterations = 0;
+
+		// Returns a random tile
+		function randomTile(x, y) {
+			var r = Math.floor(Math.random() * 255);
+			var g = Math.floor(Math.random() * 255);
+			var b = Math.floor(Math.random() * 255);
+			var c = Math.floor(Math.random() * chars.length);
+			return new ut.Tile(chars[c], r, g, b);
+		}
+
+		function tick() {
+			eng.update();
+			term.render();
+			++iterations;
+		}
+
+		function result() {
+			var diff = (new Date).getTime() - start_time;
+			clearInterval(interval1);
+			clearInterval(interval2);
+			var elem = document.getElementById("result");
+			elem.innerHTML = 
+				"Iterations: " + iterations + " (in " + diff + " ms)<br/>" +
+				"Average time: " + diff/iterations + " ms";
+		}
+
+		// Called after HTML is loaded, initializes UnicodeTiles etc.
+		function start() {
+			term = new ut.Viewport(document.getElementById("game"), 51, 25);
+			eng = new ut.Engine(term, randomTile);
+			interval1 = window.setInterval(result, 5000);
+			start_time = (new Date).getTime();
+			interval2 = window.setInterval(tick, 0);
+		}
+
+	</script> 
+</head>
+
+<body onload="start();"><div id="container">
+
+	<p id="result" class="centerer">Test running...</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<!--<a class="backlink" href="index.html">&lt;-- Back</a>-->
+
+</div></body>
+</html>
