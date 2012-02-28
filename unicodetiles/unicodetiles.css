@@ -12,16 +12,14 @@
 	font-family: "DejaVuSansMono", "DejaVu Sans Mono", monospace;
 	white-space: pre;
 	text-align: center;
-	line-height: 0.9;
+	line-height: 1;
 	letter-spacing: 0px;
 	display: inline-block;
-	overflow: hidden;
 }
 
 .unicodetiles div {
 	float: left;
-	height: 0.95em;
-	overflow-y: hidden;
+	height: 1em;
 }
 
 .unicodetiles br {
