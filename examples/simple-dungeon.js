@@ -80,6 +80,8 @@ function initSimpleDungeon() {
 	term = new ut.Viewport(document.getElementById("game"), 41, 25);
 	// Initialize Engine, i.e. the Tile manager
 	eng = new ut.Engine(term, getDungeonTile, map[0].length, map.length);
+	// Display renderer
+	document.getElementById("renderer").innerHTML = term.getRendererString();
 	// Initialize input
 	ut.initInput(onKeyDown);
 }

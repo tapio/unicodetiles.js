@@ -15,6 +15,9 @@
 		function start() {
 			term = new ut.Viewport(document.getElementById("game"), 45, 25);
 
+			// Display renderer
+			document.getElementById("renderer").innerHTML = term.getRendererString();
+
 			term.clear();
 
 			term.putString("Hello world!", 0,0, 0,255,0);
@@ -34,6 +37,8 @@
 	<div class="centerer">
 		<div id="game">Enable JavaScript and reload the page.</div>
 	</div>
+
+	<p class="centerer">Renderer: <span id="renderer"></span></p>
 
 	<a class="backlink" href="index.html">&lt;-- Back to index</a>
 
