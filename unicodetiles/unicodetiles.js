@@ -106,7 +106,7 @@ ut.NULLTILE = new ut.Tile();
 ///   elem - the DOM element which shall be transformed into the tile engine
 ///   w - (integer) width in tiles
 ///   h - (integer) height in tiles
-///   renderer - (optional) choose rendering engine, possible values are: "auto" (default), "canvas", "dom"
+///   renderer - (optional) choose rendering engine, see <Viewport.setRenderer>, defaults to "auto".
 ut.Viewport = function(elem, w, h, renderer) {
 	"use strict";
 	this.elem = elem;
@@ -124,6 +124,13 @@ ut.Viewport = function(elem, w, h, renderer) {
 		else elem.className += " " + ut.CSSCLASS;
 	}
 
+	// Create two 2-dimensional array to hold the viewport tiles
+	this.buffer = new Array(h);
+	for (j = 0; j < h; ++j)
+		this.buffer[j] = new Array(w);
+
+	/// Function: updateStyle
+	/// If the style of the parent element is modified, this needs to be called.
 	this.updateStyle = function() {
 		var s = window.getComputedStyle(this.elem);
 		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
@@ -134,36 +141,40 @@ ut.Viewport = function(elem, w, h, renderer) {
 		this.defaultBackground = s.backgroundColor;
 	};
 
-	if (renderer === "auto" || renderer === "canvas") {
-		// Create the visible canvas
-		this.canvas = document.createElement("canvas");
-		this.elem.appendChild(this.canvas);
-		// Create an offscreen canvas for rendering
-		this.offscreen = document.createElement("canvas");
-		this.ctx = this.offscreen.getContext("2d");
-		this.ctx2 = this.canvas.getContext("2d");
-		if (this.ctx && this.ctx2) {
-			this.updateStyle();
-			this.canvas.width = this.tw * w;
-			this.canvas.height = this.th * h;
-			this.offscreen.width = this.canvas.width;
-			this.offscreen.height = this.canvas.height;
-			// Doing this again since setting canvas w/h resets the state
-			this.updateStyle();
-		} else {
-			this.elem.removeChild(this.canvas);
-			this.canvas = this.offscreen = undefined;
-			this.ctx = this.ctx2 = undefined;
-			renderer = "dom";
+	/// Function: setRenderer
+	/// Switch renderer at runtime. All methods fallback to "dom" if unsuccesful.
+	/// Possible values:
+	///   * "canvas" - Use HTML5 <canvas> element
+	///   * "dom" - Use regular HTML element manipulation through DOM
+	///   * "auto" - Use best available, currently same as "canvas"
+	this.setRenderer = function(newrenderer) {
+		if (newrenderer === "auto" || newrenderer === "canvas") {
+			// Create the visible canvas
+			this.canvas = document.createElement("canvas");
+			this.elem.appendChild(this.canvas);
+			// Create an offscreen canvas for rendering
+			this.offscreen = document.createElement("canvas");
+			this.ctx = this.offscreen.getContext("2d");
+			this.ctx2 = this.canvas.getContext("2d");
+			if (this.ctx && this.ctx2) {
+				this.updateStyle();
+				this.canvas.width = this.tw * w;
+				this.canvas.height = this.th * h;
+				this.offscreen.width = this.canvas.width;
+				this.offscreen.height = this.canvas.height;
+				// Doing this again since setting canvas w/h resets the state
+				this.updateStyle();
+				return;
+			} else {
+				// Canvas failed
+				this.elem.removeChild(this.canvas);
+				this.canvas = this.offscreen = undefined;
+				this.ctx = this.ctx2 = undefined;
+				newrenderer = "dom";
+			}
 		}
-	}
 
-	// Create two 2-dimensional array to hold the viewport tiles
-	this.buffer = new Array(h);
-	for (j = 0; j < h; ++j)
-		this.buffer[j] = new Array(w);
-
-	if (!this.ctx) {
+		// If we got here, all other methods have failed
 		// Create a matrix of <span> elements, cache references
 		this.spans = new Array(h);
 		this.colors = new Array(h);
@@ -178,7 +189,9 @@ ut.Viewport = function(elem, w, h, renderer) {
 			this.spans[j].push(document.createElement("br"));
 			this.elem.appendChild(this.spans[j][this.w]);
 		}
-	}
+	};
+
+	this.setRenderer(renderer);
 };
 
 	/// Function: getRendererString
