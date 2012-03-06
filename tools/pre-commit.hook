@@ -3,5 +3,5 @@
 # A git hook to do some validation and checks just before committing.
 # Copy or symlink this to .git/hooks/pre-commit
 
-jshint unicodetiles/*.js examples/*.js
+jshint unicodetiles/*.js examples/*.js tests/*.js
 
