@@ -126,8 +126,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 
 	this.updateStyle = function() {
 		var s = window.getComputedStyle(this.elem);
-		this.font = s.font;
-		this.ctx.font = s.font;
+		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 		this.ctx.textBaseline = "middle";
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
@@ -274,8 +273,8 @@ ut.Viewport = function(elem, w, h, renderer) {
 				ch = tile.ch;
 				fg = tile.getColorRGB();
 				bg = tile.getBackgroundRGB();
-				x = i * this.tw;
-				y = (j+0.5) * this.th; // 0.5 because textBaseline is middle
+				x = Math.floor(i * this.tw);
+				y = Math.floor((j+0.5) * this.th); // 0.5 because textBaseline is middle
 				// Only render background if the color is non-default
 				if (bg.length && bg !== this.defaultBackground) {
 					this.ctx.fillStyle = bg;
