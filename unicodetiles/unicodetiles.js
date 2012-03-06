@@ -106,7 +106,7 @@ ut.NULLTILE = new ut.Tile();
 ///   elem - the DOM element which shall be transformed into the tile engine
 ///   w - (integer) width in tiles
 ///   h - (integer) height in tiles
-ut.Viewport = function(elem, w, h) {
+ut.Viewport = function(elem, w, h, mode) {
 	"use strict";
 	this.elem = elem;
 	this.elem.innerHTML = "";
@@ -122,25 +122,46 @@ ut.Viewport = function(elem, w, h) {
 		else elem.className += " " + ut.CSSCLASS;
 	}
 
-	// Create two 2-dimensional arrays to hold the viewport tiles and <span> elements
-	this.buffer = new Array(h);
-	this.spans = new Array(h);
-	this.colors = new Array(h);
-	for (j = 0; j < h; ++j) {
-		this.buffer[j] = new Array(w);
-		this.spans[j] = new Array(w);
-		this.colors[j] = new Array(w);
+	if (!mode) {
+		this.canvas = document.createElement("canvas");
+		this.elem.appendChild(this.canvas);
+		this.ctx = this.canvas.getContext("2d");
+		if (this.ctx) {
+			this.canvas.className = ut.CSSCLASS;
+			var s = window.getComputedStyle(this.elem);
+			this.ctx.font = s.font;
+			this.ctx.textBaseline = "top";
+			var tw = this.ctx.measureText("M").width;
+			var th = parseInt(s.fontSize, 10);
+			this.canvas.width = tw*w;
+			this.canvas.height = th*h;
+		} else {
+			this.elem.removeChild(this.canvas);
+			this.canvas = undefined;
+			mode = "DOM";
+		}
 	}
 
-	// Create a matrix of <span> elements, cache references
-	for (j = 0; j < this.h; ++j) {
-		for (i = 0; i < this.w; ++i) {
-			this.spans[j][i] = document.createElement("div");
-			this.elem.appendChild(this.spans[j][i]);
+	// Create two 2-dimensional array to hold the viewport tiles
+	this.buffer = new Array(h);
+	for (j = 0; j < h; ++j)
+		this.buffer[j] = new Array(w);
+
+	if (!this.ctx) {
+		// Create a matrix of <span> elements, cache references
+		this.spans = new Array(h);
+		this.colors = new Array(h);
+		for (j = 0; j < this.h; ++j) {
+			this.spans[j] = new Array(w);
+			this.colors[j] = new Array(w);
+			for (i = 0; i < this.w; ++i) {
+				this.spans[j][i] = document.createElement("div");
+				this.elem.appendChild(this.spans[j][i]);
+			}
+			// Line break
+			this.spans[j].push(document.createElement("br"));
+			this.elem.appendChild(this.spans[j][this.w]);
 		}
-		// Line break
-		this.spans[j].push(document.createElement("br"));
-		this.elem.appendChild(this.spans[j][this.w]);
 	}
 };
 
@@ -217,7 +238,25 @@ ut.Viewport = function(elem, w, h) {
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
 				this.buffer[j][i] = ut.NULLTILE;
-				this.colors[j][i] = "";
+				if (!this.ctx) this.colors[j][i] = "";
+			}
+		}
+	};
+
+	/// Function: renderCanvas
+	/// Renders the buffer to <canvas> element created in constructor.
+	ut.Viewport.prototype.renderCanvas = function() {
+		this.canvas.width = this.canvas.width; // Clear
+		var s = window.getComputedStyle(this.elem);
+		this.ctx.font = s.font;
+		this.ctx.textBaseline = "top";
+		var tw = this.ctx.measureText("M").width;
+		var th = parseInt(s.fontSize, 10);
+		for (var j = 0; j < this.h; ++j) {
+			for (var i = 0; i < this.w; ++i) {
+				var tile = this.buffer[j][i];
+				this.ctx.fillStyle = tile.getColorRGB();
+				this.ctx.fillText(tile.getChar(), i*tw, j*th);
 			}
 		}
 	};
@@ -225,6 +264,7 @@ ut.Viewport = function(elem, w, h) {
 	/// Function: render
 	/// Renders the buffer as html to the element specified at construction.
 	ut.Viewport.prototype.render = function() {
+		if (this.ctx) { this.renderCanvas(); return; }
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
 				var tile = this.buffer[j][i];
