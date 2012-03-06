@@ -7,6 +7,9 @@ This JavaScript library provides a text character based tile engine for creating
 Current features
 ----------------
 * Viewport - _character grid display_
+	- Two rendering engines: faster HTML5 Canvas and slower DOM
+	- Uses Canvas by default, but automatically falls back to DOM if canvas is not supported
+	- Rendering engine can be switched on-the-fly
 	- Colored characters
 	- Colored character backgrounds
 	- Arbitrary character viewport size
