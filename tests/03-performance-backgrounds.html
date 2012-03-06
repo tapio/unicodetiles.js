@@ -42,11 +42,30 @@
 				"Average time: " + diff/iterations + " ms";
 		}
 
+		function again() {
+			window.location = window.location.pathname + document.getElementById("switch-renderer").getAttribute("href")
+			window.location.reload(true);
+		}
+
 		// Called after HTML is loaded, initializes UnicodeTiles etc.
 		function start() {
-			term = new ut.Viewport(document.getElementById("game"), 51, 25);
+			var renderer = "auto";
+			if (location.hash.indexOf("#dom") != -1) renderer = "dom"
+
+			term = new ut.Viewport(document.getElementById("game"), 51, 25, renderer);
 			eng = new ut.Engine(term, randomTile);
+
 			document.getElementById("renderer").innerHTML = term.getRendererString();
+			var a = document.getElementById("switch-renderer");
+			a.onclick = again;
+			if (term.getRendererString() === "dom") {
+				a.innerHTML = "Switch to &lt;canvas&gt; renderer";
+				a.href = "#canvas";
+			} else {
+				a.innerHTML = "Switch to DOM renderer";
+				a.href = "#dom";
+			}
+
 			interval1 = window.setInterval(result, 5000);
 			start_time = (new Date).getTime();
 			interval2 = window.setInterval(tick, 0);
@@ -63,7 +82,10 @@
 		<div id="game">Enable JavaScript and reload the page.</div>
 	</div>
 
-	<p class="centerer">Renderer: <span id="renderer"></span></p>
+	<div class="centerer">
+		<p>Renderer: <span id="renderer"></span></p>
+		<a href="#" id="switch-renderer">Switch</a>
+	</div>
 
 	<!--<a class="backlink" href="index.html">&lt;-- Back</a>-->
 
