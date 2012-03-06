@@ -254,22 +254,30 @@ ut.Viewport = function(elem, w, h, mode) {
 	/// Function: renderCanvas
 	/// Renders the buffer to <canvas> element created in constructor.
 	ut.Viewport.prototype.renderCanvas = function() {
-		var x, y;
+		var tile, ch, fg, bg, x, y;
 		var hth = 0.5*this.th;
+		// Clearing with one big rect is much faster than with individual char rects
+		this.ctx.fillStyle = this.defaultBackground;
+		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
-				var tile = this.buffer[j][i];
-				var ch = tile.ch;
-				var fg = tile.getColorRGB();
-				var bg = tile.getBackgroundRGB();
-				if (!fg.length) fg = this.defaultColor;
-				if (!bg.length) bg = this.defaultBackground;
+				tile = this.buffer[j][i];
+				ch = tile.ch;
+				fg = tile.getColorRGB();
+				bg = tile.getBackgroundRGB();
 				x = i * this.tw;
-				y = (j+0.5) * this.th;
-				this.ctx.fillStyle = bg;
-				this.ctx.fillRect(x, y-hth, this.tw, this.th);
-				this.ctx.fillStyle = tile.getColorRGB();
-				this.ctx.fillText(tile.getChar(), x, y);
+				y = (j+0.5) * this.th; // 0.5 because textBaseline is middle
+				// Only render background if the color is non-default
+				if (bg.length && bg !== this.defaultBackground) {
+					this.ctx.fillStyle = bg;
+					this.ctx.fillRect(x, y-hth, this.tw, this.th);
+				}
+				// Do not attempt to render empty char
+				if (ch.length) {
+					if (!fg.length) fg = this.defaultColor;
+					this.ctx.fillStyle = fg;
+					this.ctx.fillText(ch, x, y);
+				}
 			}
 		}
 	};
