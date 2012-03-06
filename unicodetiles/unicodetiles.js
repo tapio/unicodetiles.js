@@ -106,7 +106,8 @@ ut.NULLTILE = new ut.Tile();
 ///   elem - the DOM element which shall be transformed into the tile engine
 ///   w - (integer) width in tiles
 ///   h - (integer) height in tiles
-ut.Viewport = function(elem, w, h, mode) {
+///   renderer - (optional) choose rendering engine, possible values are: "auto" (default), "canvas", "dom"
+ut.Viewport = function(elem, w, h, renderer) {
 	"use strict";
 	this.elem = elem;
 	this.elem.innerHTML = "";
@@ -115,6 +116,7 @@ ut.Viewport = function(elem, w, h, mode) {
 	this.cx = Math.floor(this.w/2);
 	this.cy = Math.floor(this.h/2);
 	var i, j;
+	renderer = renderer || "auto";
 
 	// Add CSS class if not added already
 	if (elem.className.indexOf(ut.CSSCLASS) === -1) {
@@ -133,7 +135,7 @@ ut.Viewport = function(elem, w, h, mode) {
 		this.defaultBackground = s.backgroundColor;
 	};
 
-	if (!mode) {
+	if (renderer === "auto" || renderer === "canvas") {
 		this.canvas = document.createElement("canvas");
 		this.elem.appendChild(this.canvas);
 		this.ctx = this.canvas.getContext("2d");
@@ -146,7 +148,7 @@ ut.Viewport = function(elem, w, h, mode) {
 		} else {
 			this.elem.removeChild(this.canvas);
 			this.canvas = undefined;
-			mode = "DOM";
+			renderer = "dom";
 		}
 	}
 
