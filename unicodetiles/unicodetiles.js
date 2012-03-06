@@ -181,6 +181,17 @@ ut.Viewport = function(elem, w, h, renderer) {
 	}
 };
 
+	/// Function: getRendererString
+	/// Gets the currently used renderer.
+	///
+	/// Returns:
+	///   "canvas" if the HTML5 <canvas> renderer is used, "dom" otherwise.
+	ut.Viewport.prototype.getRendererString = function() {
+		if (this.ctx && this.ctx2 && this.canvas && this.offscreen)
+			return "canvas";
+		return "dom";
+	};
+
 	/// Function: put
 	/// Puts a tile to the given coordinates.
 	/// Checks bounds and does nothing if invalid coordinates are given.
