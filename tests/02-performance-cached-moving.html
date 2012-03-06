@@ -46,6 +46,7 @@
 			term = new ut.Viewport(document.getElementById("game"), 51, 25);
 			eng = new ut.Engine(term, randomTile);
 			eng.setCacheEnabled(true);
+			document.getElementById("renderer").innerHTML = term.getRendererString();
 			interval1 = window.setInterval(result, 5000);
 			start_time = (new Date).getTime();
 			interval2 = window.setInterval(tick, 0);
@@ -61,6 +62,8 @@
 	<div class="centerer">
 		<div id="game">Enable JavaScript and reload the page.</div>
 	</div>
+
+	<p class="centerer">Renderer: <span id="renderer"></span></p>
 
 	<!--<a class="backlink" href="index.html">&lt;-- Back</a>-->
 
