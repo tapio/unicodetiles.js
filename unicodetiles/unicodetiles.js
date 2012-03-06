@@ -122,19 +122,25 @@ ut.Viewport = function(elem, w, h, mode) {
 		else elem.className += " " + ut.CSSCLASS;
 	}
 
+	this.updateStyle = function() {
+		var s = window.getComputedStyle(this.elem);
+		this.font = s.font;
+		this.ctx.font = s.font;
+		this.ctx.textBaseline = "top";
+		this.tw = this.ctx.measureText("M").width;
+		this.th = parseInt(s.fontSize, 10);
+	};
+
 	if (!mode) {
 		this.canvas = document.createElement("canvas");
 		this.elem.appendChild(this.canvas);
 		this.ctx = this.canvas.getContext("2d");
 		if (this.ctx) {
-			this.canvas.className = ut.CSSCLASS;
-			var s = window.getComputedStyle(this.elem);
-			this.ctx.font = s.font;
-			this.ctx.textBaseline = "top";
-			var tw = this.ctx.measureText("M").width;
-			var th = parseInt(s.fontSize, 10);
-			this.canvas.width = tw*w;
-			this.canvas.height = th*h;
+			this.updateStyle();
+			this.canvas.width = this.tw * w;
+			this.canvas.height = this.th * h;
+			// Doing this again since setting canvas w/h resets the state
+			this.updateStyle();
 		} else {
 			this.elem.removeChild(this.canvas);
 			this.canvas = undefined;
@@ -246,17 +252,13 @@ ut.Viewport = function(elem, w, h, mode) {
 	/// Function: renderCanvas
 	/// Renders the buffer to <canvas> element created in constructor.
 	ut.Viewport.prototype.renderCanvas = function() {
-		this.canvas.width = this.canvas.width; // Clear
-		var s = window.getComputedStyle(this.elem);
-		this.ctx.font = s.font;
-		this.ctx.textBaseline = "top";
-		var tw = this.ctx.measureText("M").width;
-		var th = parseInt(s.fontSize, 10);
+		this.ctx.fillStyle = "#000000";
+		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
 				var tile = this.buffer[j][i];
 				this.ctx.fillStyle = tile.getColorRGB();
-				this.ctx.fillText(tile.getChar(), i*tw, j*th);
+				this.ctx.fillText(tile.getChar(), i * this.tw, j * this.th);
 			}
 		}
 	};
