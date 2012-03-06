@@ -8,6 +8,7 @@
 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript" src="../unicodetiles/input.js"></script>
+	<script type="text/javascript" src="renderer-switcher.js"></script>
 	<!-- We are extending the simple-dungeon example -->
 	<script type="text/javascript" src="simple-dungeon.js"></script>
 	<!-- We are extending the fov-dungeon example -->
@@ -48,7 +49,7 @@
 	</script>
 </head>
 
-<body onload="initSimpleDungeon(); initFOV(); initForest();">
+<body onload="initSimpleDungeon(); createRendererSwitcher(); initFOV(); initForest();">
 
 	<p class="centerer">Move around with arrow keys.</p>
 
@@ -56,7 +57,9 @@
 		<div id="game">Enable JavaScript and reload the page.</div>
 	</div>
 
-	<p class="centerer">Renderer: <span id="renderer"></span></p>
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
 
 	<a class="backlink" href="index.html">&lt;-- Back to index</a>
 

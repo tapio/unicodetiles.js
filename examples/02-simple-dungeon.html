@@ -8,13 +8,14 @@
 	<link href="style.css" rel="stylesheet" type="text/css" />
 	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
 	<script type="text/javascript" src="../unicodetiles/input.js"></script>
+	<script type="text/javascript" src="renderer-switcher.js"></script>
 	<!--
 		Check the JS file below for the actual source code!
 	-->
 	<script type="text/javascript" src="simple-dungeon.js"></script>
 </head>
 
-<body onload="initSimpleDungeon();">
+<body onload="initSimpleDungeon(); createRendererSwitcher();">
 
 	<p class="centerer">Move around with arrow keys.</p>
 
@@ -22,7 +23,9 @@
 		<div id="game">Enable JavaScript and reload the page.</div>
 	</div>
 
-	<p class="centerer">Renderer: <span id="renderer"></span></p>
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
 
 	<a class="backlink" href="index.html">&lt;-- Back to index</a>
 
