@@ -126,9 +126,11 @@ ut.Viewport = function(elem, w, h, mode) {
 		var s = window.getComputedStyle(this.elem);
 		this.font = s.font;
 		this.ctx.font = s.font;
-		this.ctx.textBaseline = "top";
+		this.ctx.textBaseline = "middle";
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
+		this.defaultColor = s.color;
+		this.defaultBackground = s.backgroundColor;
 	};
 
 	if (!mode) {
@@ -252,13 +254,22 @@ ut.Viewport = function(elem, w, h, mode) {
 	/// Function: renderCanvas
 	/// Renders the buffer to <canvas> element created in constructor.
 	ut.Viewport.prototype.renderCanvas = function() {
-		this.ctx.fillStyle = "#000000";
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		var x, y;
+		var hth = 0.5*this.th;
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
 				var tile = this.buffer[j][i];
+				var ch = tile.ch;
+				var fg = tile.getColorRGB();
+				var bg = tile.getBackgroundRGB();
+				if (!fg.length) fg = this.defaultColor;
+				if (!bg.length) bg = this.defaultBackground;
+				x = i * this.tw;
+				y = (j+0.5) * this.th;
+				this.ctx.fillStyle = bg;
+				this.ctx.fillRect(x, y-hth, this.tw, this.th);
 				this.ctx.fillStyle = tile.getColorRGB();
-				this.ctx.fillText(tile.getChar(), i * this.tw, j * this.th);
+				this.ctx.fillText(tile.getChar(), x, y);
 			}
 		}
 	};
