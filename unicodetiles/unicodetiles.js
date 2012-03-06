@@ -136,18 +136,25 @@ ut.Viewport = function(elem, w, h, renderer) {
 	};
 
 	if (renderer === "auto" || renderer === "canvas") {
+		// Create the visible canvas
 		this.canvas = document.createElement("canvas");
 		this.elem.appendChild(this.canvas);
-		this.ctx = this.canvas.getContext("2d");
-		if (this.ctx) {
+		// Create an offscreen canvas for rendering
+		this.offscreen = document.createElement("canvas");
+		this.ctx = this.offscreen.getContext("2d");
+		this.ctx2 = this.canvas.getContext("2d");
+		if (this.ctx && this.ctx2) {
 			this.updateStyle();
 			this.canvas.width = this.tw * w;
 			this.canvas.height = this.th * h;
+			this.offscreen.width = this.canvas.width;
+			this.offscreen.height = this.canvas.height;
 			// Doing this again since setting canvas w/h resets the state
 			this.updateStyle();
 		} else {
 			this.elem.removeChild(this.canvas);
-			this.canvas = undefined;
+			this.canvas = this.offscreen = undefined;
+			this.ctx = this.ctx2 = undefined;
 			renderer = "dom";
 		}
 	}
@@ -282,6 +289,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 				}
 			}
 		}
+		this.ctx2.drawImage(this.offscreen, 0, 0);
 	};
 
 	/// Function: render
