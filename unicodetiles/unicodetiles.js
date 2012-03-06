@@ -148,6 +148,10 @@ ut.Viewport = function(elem, w, h, renderer) {
 	///   * "dom" - Use regular HTML element manipulation through DOM
 	///   * "auto" - Use best available, currently same as "canvas"
 	this.setRenderer = function(newrenderer) {
+		// Reset stuff
+		this.elem.innerHTML = "";
+		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = undefined;
+		// Canvas
 		if (newrenderer === "auto" || newrenderer === "canvas") {
 			// Create the visible canvas
 			this.canvas = document.createElement("canvas");
@@ -174,7 +178,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 			}
 		}
 
-		// If we got here, all other methods have failed
+		// If we got here, all other methods have failed, or DOM was requested
 		// Create a matrix of <span> elements, cache references
 		this.spans = new Array(h);
 		this.colors = new Array(h);
