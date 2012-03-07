@@ -132,7 +132,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 	/// Function: updateStyle
 	/// If the style of the parent element is modified, this needs to be called.
 	this.updateStyle = function() {
-		var s = window.getComputedStyle(this.elem);
+		var s = window.getComputedStyle(this.elem, null);
 		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 		this.ctx.textBaseline = "middle";
 		this.tw = this.ctx.measureText("M").width;
@@ -155,12 +155,12 @@ ut.Viewport = function(elem, w, h, renderer) {
 		if (newrenderer === "auto" || newrenderer === "canvas") {
 			// Create the visible canvas
 			this.canvas = document.createElement("canvas");
-			this.elem.appendChild(this.canvas);
-			// Create an offscreen canvas for rendering
-			this.offscreen = document.createElement("canvas");
-			this.ctx = this.offscreen.getContext("2d");
-			this.ctx2 = this.canvas.getContext("2d");
-			if (this.ctx && this.ctx2) {
+			if (!!(this.canvas.getContext && this.canvas.getContext('2d') && this.canvas.getContext('2d').fillText)) {
+				this.elem.appendChild(this.canvas);
+				// Create an offscreen canvas for rendering
+				this.offscreen = document.createElement("canvas");
+				this.ctx = this.offscreen.getContext("2d");
+				this.ctx2 = this.canvas.getContext("2d");
 				this.updateStyle();
 				this.canvas.width = this.tw * w;
 				this.canvas.height = this.th * h;
@@ -171,9 +171,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 				return;
 			} else {
 				// Canvas failed
-				this.elem.removeChild(this.canvas);
-				this.canvas = this.offscreen = undefined;
-				this.ctx = this.ctx2 = undefined;
+				this.canvas = undefined;
 				newrenderer = "dom";
 			}
 		}
