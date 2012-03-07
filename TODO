@@ -1,8 +1,8 @@
 General:
-	* Test IE compatibility
 Engine:
-	* Test & profile tile cache
+Input:
+	* Key repeat broken on Opera (does not honor the delay)
 Viewport:
-	* setDefaultColor
-	* setDefaultBackground
+	* setDefaultColor, setDefaultBackground
+		-> CSS from the parent as is now?
 
