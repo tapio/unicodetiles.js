@@ -170,8 +170,6 @@ ut.setKeyRepeatInterval = function(milliseconds) {
 ///   onkeydown - (optional) function(keyCode) for key down event handler
 ///   onkeyup - (optional) function(keyCode) for key up event handler
 ut.initInput = function(onKeyDown, onKeyUp) {
-	ut.pressedKeys[ut.KEY_CTRL] = null;
-	ut.pressedKeys[ut.KEY_ALT] = null;
 	ut.onkeydown = onKeyDown;
 	ut.onkeyup = onKeyUp;
 	// Attach default onkeydown handler that updates pressedKeys
@@ -185,7 +183,7 @@ ut.initInput = function(onKeyDown, onKeyUp) {
 			// Setup keyrepeat
 			ut.pressedKeys[k] = setInterval("ut.onkeydown("+k+")", ut.keyRepeatDelay);
 		}
-		if (ut.pressedKeys[ut.KEY_CTRL] !== null || ut.pressedKeys[ut.KEY_ALT] !== null)
+		if (ut.pressedKeys[ut.KEY_CTRL] || ut.pressedKeys[ut.KEY_ALT])
 			return true; // CTRL/ALT for browser hotkeys
 		else return false;
 	};
