@@ -147,7 +147,7 @@ ut.keyRepeatDelay = 150;
 ///    True if the key is pressed down, false otherwise.
 ut.isKeyPressed = function(key) {
 	"use strict";
-	if (ut.pressedKeys[key] !== null) return true;
+	if (ut.pressedKeys[key]) return true;
 	else return false;
 };
 
