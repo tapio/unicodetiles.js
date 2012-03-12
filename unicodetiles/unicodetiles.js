@@ -91,6 +91,20 @@ ut.Tile = function(ch, r, g, b, br, bg, bb) {
 			return 'rgb('+this.br+','+this.bg+','+this.bb+')';
 		else return "";
 	};
+	/// Function getColorJSON
+	/// Returns the JSON representation of the color, i.e. object { r, g, b }
+	ut.Tile.prototype.getColorJSON = function() {
+		if (this.r !== undefined && this.g !== undefined && this.b !== undefined)
+			return { "r": this.r, "g": this.g, "b": this.b };
+		else return {};
+	};
+	/// Function getBackgroundJSON
+	/// Returns the JSON representation of the background color, i.e. object { r, g, b }
+	ut.Tile.prototype.getBackgroundJSON = function() {
+		if (this.r !== undefined && this.g !== undefined && this.b !== undefined)
+			return { "r": this.br, "g": this.bg, "b": this.bb };
+		else return {};
+	};
 
 ut.NULLTILE = new ut.Tile();
 
