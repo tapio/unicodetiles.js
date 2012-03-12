@@ -8,15 +8,27 @@
 var ut = ut || {};
 
 /// Constants: Keycodes
+/// KEY_BACKSPACE - 8
 /// KEY_ENTER - 13
 /// KEY_SHIFT - 16
 /// KEY_CTRL - 17
 /// KEY_ALT - 18
+/// KEY_ESCAPE - 27
 /// KEY_SPACE - 32
 /// KEY_LEFT - 37
 /// KEY_UP - 38
 /// KEY_RIGHT - 39
 /// KEY_DOWN - 40
+/// KEY_0 - 48
+/// KEY_1 - 49
+/// KEY_2 - 50
+/// KEY_3 - 51
+/// KEY_4 - 52
+/// KEY_5 - 53
+/// KEY_6 - 54
+/// KEY_7 - 55
+/// KEY_8 - 56
+/// KEY_9 - 57
 /// KEY_A - 65
 /// KEY_B - 66
 /// KEY_C - 67
@@ -43,17 +55,43 @@ var ut = ut || {};
 /// KEY_X - 88
 /// KEY_Y - 89
 /// KEY_Z - 90
+/// KEY_NUMPAD0 - 96
+/// KEY_NUMPAD1 - 97
+/// KEY_NUMPAD2 - 98
+/// KEY_NUMPAD3 - 99
+/// KEY_NUMPAD4 - 100
+/// KEY_NUMPAD5 - 101
+/// KEY_NUMPAD6 - 102
+/// KEY_NUMPAD7 - 103
+/// KEY_NUMPAD8 - 104
+/// KEY_NUMPAD9 - 105
+/// KEY_COMMA - 188
+/// KEY_DASH - 189
+/// KEY_PERIOD - 190
 
+ut.KEY_BACKSPACE = 8;
 ut.KEY_ENTER = 13;
 ut.KEY_SHIFT = 16;
 ut.KEY_CTRL = 17;
 ut.KEY_ALT = 18;
+ut.KEY_ALT = 18;
+ut.KEY_ESCAPE = 27;
 ut.KEY_SPACE = 32;
 ut.KEY_LEFT = 37;
 ut.KEY_UP = 38;
 ut.KEY_RIGHT = 39;
 ut.KEY_DOWN = 40;
 
+ut.KEY_0 = 48;
+ut.KEY_1 = 49;
+ut.KEY_2 = 50;
+ut.KEY_3 = 51;
+ut.KEY_4 = 52;
+ut.KEY_5 = 53;
+ut.KEY_6 = 54;
+ut.KEY_7 = 55;
+ut.KEY_8 = 56;
+ut.KEY_9 = 57;
 ut.KEY_A = 65;
 ut.KEY_B = 66;
 ut.KEY_C = 67;
@@ -80,6 +118,21 @@ ut.KEY_W = 87;
 ut.KEY_X = 88;
 ut.KEY_Y = 89;
 ut.KEY_Z = 90;
+ut.KEY_NUMPAD0 = 96;
+ut.KEY_NUMPAD1 = 97;
+ut.KEY_NUMPAD2 = 98;
+ut.KEY_NUMPAD3 = 99;
+ut.KEY_NUMPAD4 = 100;
+ut.KEY_NUMPAD5 = 101;
+ut.KEY_NUMPAD6 = 102;
+ut.KEY_NUMPAD7 = 103;
+ut.KEY_NUMPAD8 = 104;
+ut.KEY_NUMPAD9 = 105;
+
+ut.KEY_COMMA = 188;
+ut.KEY_DASH = 189;
+ut.KEY_PERIOD = 190;
+
 
 ut.pressedKeys = {};
 ut.keyRepeatDelay = 150;
