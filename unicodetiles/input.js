@@ -9,6 +9,7 @@ var ut = ut || {};
 
 /// Constants: Keycodes
 /// KEY_BACKSPACE - 8
+/// KEY_TAB - 9
 /// KEY_ENTER - 13
 /// KEY_SHIFT - 16
 /// KEY_CTRL - 17
@@ -70,6 +71,7 @@ var ut = ut || {};
 /// KEY_PERIOD - 190
 
 ut.KEY_BACKSPACE = 8;
+ut.KEY_TAB = 9;
 ut.KEY_ENTER = 13;
 ut.KEY_SHIFT = 16;
 ut.KEY_CTRL = 17;
