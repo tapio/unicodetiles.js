@@ -412,6 +412,15 @@ ut.Engine = function(vp, func, w, h) {
 	///   func - function taking parameters (tile, x, y) and returning an ut.Tile
 	ut.Engine.prototype.setShaderFunc = function(func) { this.shaderFunc = func; };
 
+	/// Function: setWorldSize
+	/// Tiles outside of the range x = [0,width[; y = [0,height[ are not fetched.
+	/// Set to undefined in order to make the world infinite.
+	///
+	/// Parameters:
+	///   width - (integer) new world width
+	///   height - (integer) new world height
+	ut.Engine.prototype.setWorldSize = function(width, height) { this.w = width; this.h = height; };
+
 	/// Function: setCacheEnabled
 	/// Enables or disables the usage of tile cache. This means that
 	/// extra measures are taken to not call the tile function unnecessarily.
