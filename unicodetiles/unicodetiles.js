@@ -113,6 +113,7 @@ ut.Tile = function(ch, r, g, b, br, bg, bb) {
 
 ut.NULLTILE = new ut.Tile();
 
+ut.viewportStyleUpdaterHack = null;
 
 /// Class: Viewport
 /// The tile engine viewport / renderer / window.
@@ -126,7 +127,8 @@ ut.NULLTILE = new ut.Tile();
 ///   w - (integer) width in tiles
 ///   h - (integer) height in tiles
 ///   renderer - (optional) choose rendering engine, see <Viewport.setRenderer>, defaults to "auto".
-ut.Viewport = function(elem, w, h, renderer) {
+///   squarify - (optional) set to true to force the tiles square; may break some box drawing
+ut.Viewport = function(elem, w, h, renderer, squarify) {
 	"use strict";
 	this.elem = elem;
 	this.elem.innerHTML = "";
@@ -136,6 +138,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 	this.cy = Math.floor(this.h/2);
 	var i, j;
 	renderer = renderer || "auto";
+	ut.viewportStyleUpdaterHack = this;
 
 	// Add CSS class if not added already
 	if (elem.className.indexOf(ut.CSSCLASS) === -1) {
@@ -152,12 +155,27 @@ ut.Viewport = function(elem, w, h, renderer) {
 	/// If the style of the parent element is modified, this needs to be called.
 	this.updateStyle = function() {
 		var s = window.getComputedStyle(this.elem, null);
-		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
-		this.ctx.textBaseline = "middle";
-		this.tw = this.ctx.measureText("M").width;
-		this.th = parseInt(s.fontSize, 10);
 		this.defaultColor = s.color;
 		this.defaultBackground = s.backgroundColor;
+		if (this.ctx) {
+			this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
+			this.ctx.textBaseline = "middle";
+			this.tw = this.ctx.measureText("M").width;
+			this.th = parseInt(s.fontSize, 10);
+			this.gap = squarify ? (this.th - this.tw) : 0;
+		} else {
+			s = window.getComputedStyle(this.spans[0][0], null);
+			this.tw = parseInt(s.width, 10);
+			if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
+			this.th = parseInt(s.height, 10);
+			this.gap = squarify ? (this.th - this.tw) : 0;
+			for (j = 0; j < this.h; ++j) {
+				for (i = 0; i < this.w; ++i) {
+					this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
+					this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
+				}
+			}
+		}
 	};
 
 	/// Function: setRenderer
@@ -181,7 +199,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 				this.ctx = this.offscreen.getContext("2d");
 				this.ctx2 = this.canvas.getContext("2d");
 				this.updateStyle();
-				this.canvas.width = this.tw * w;
+				this.canvas.width = (squarify ? this.th : this.tw) * w;
 				this.canvas.height = this.th * h;
 				this.offscreen.width = this.canvas.width;
 				this.offscreen.height = this.canvas.height;
@@ -210,6 +228,7 @@ ut.Viewport = function(elem, w, h, renderer) {
 			this.spans[j].push(document.createElement("br"));
 			this.elem.appendChild(this.spans[j][this.w]);
 		}
+		setTimeout(function() { ut.viewportStyleUpdaterHack.updateStyle(); }, 0);
 	};
 
 	this.setRenderer(renderer);
@@ -308,30 +327,33 @@ ut.Viewport = function(elem, w, h, renderer) {
 	/// Renders the buffer to <canvas> element created in constructor.
 	ut.Viewport.prototype.renderCanvas = function() {
 		var tile, ch, fg, bg, x, y;
-		var hth = 0.5*this.th;
+		var hth = (0.5*this.th)|0;
+		var hgap = (0.5*this.gap); // Squarification
 		// Clearing with one big rect is much faster than with individual char rects
 		this.ctx.fillStyle = this.defaultBackground;
 		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		y = hth; // half because textBaseline is middle
 		for (var j = 0; j < this.h; ++j) {
+			x = 0;
 			for (var i = 0; i < this.w; ++i) {
 				tile = this.buffer[j][i];
 				ch = tile.ch;
 				fg = tile.getColorRGB();
 				bg = tile.getBackgroundRGB();
-				x = Math.floor(i * this.tw);
-				y = Math.floor((j+0.5) * this.th); // 0.5 because textBaseline is middle
 				// Only render background if the color is non-default
 				if (bg.length && bg !== this.defaultBackground) {
 					this.ctx.fillStyle = bg;
-					this.ctx.fillRect(x, y-hth, this.tw, this.th);
+					this.ctx.fillRect(x, y-hth, this.tw+this.gap, this.th);
 				}
 				// Do not attempt to render empty char
 				if (ch.length) {
 					if (!fg.length) fg = this.defaultColor;
 					this.ctx.fillStyle = fg;
-					this.ctx.fillText(ch, x, y);
+					this.ctx.fillText(ch, x+hgap, y);
 				}
+				x += this.tw + this.gap;
 			}
+			y += this.th;
 		}
 		this.ctx2.drawImage(this.offscreen, 0, 0);
 	};
