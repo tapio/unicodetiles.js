@@ -14,6 +14,7 @@ Current features
 	- Colored character backgrounds
 	- Arbitrary character viewport size
 	- Character size customizable through CSS
+	- Can make the layout square
 	- Utilizes CSS3 Web Fonts (@font-face) to provide consistent look across platforms.
 * Engine - _the tile engine_
 	- Viewport updating according to player coordinates
