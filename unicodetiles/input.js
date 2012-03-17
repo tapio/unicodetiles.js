@@ -66,6 +66,18 @@ var ut = ut || {};
 /// KEY_NUMPAD7 - 103
 /// KEY_NUMPAD8 - 104
 /// KEY_NUMPAD9 - 105
+/// KEY_F1 - 112
+/// KEY_F2 - 113
+/// KEY_F3 - 114
+/// KEY_F4 - 115
+/// KEY_F5 - 116
+/// KEY_F6 - 117
+/// KEY_F7 - 118
+/// KEY_F8 - 119
+/// KEY_F9 - 120
+/// KEY_F10 - 121
+/// KEY_F11 - 122
+/// KEY_F12 - 123
 /// KEY_COMMA - 188
 /// KEY_DASH - 189
 /// KEY_PERIOD - 190
@@ -130,6 +142,18 @@ ut.KEY_NUMPAD6 = 102;
 ut.KEY_NUMPAD7 = 103;
 ut.KEY_NUMPAD8 = 104;
 ut.KEY_NUMPAD9 = 105;
+ut.KEY_F1 = 112;
+ut.KEY_F2 = 113;
+ut.KEY_F3 = 114;
+ut.KEY_F4 = 115;
+ut.KEY_F5 = 116;
+ut.KEY_F6 = 117;
+ut.KEY_F7 = 118;
+ut.KEY_F8 = 119;
+ut.KEY_F9 = 120;
+ut.KEY_F10 = 121;
+ut.KEY_F11 = 122;
+ut.KEY_F12 = 123;
 
 ut.KEY_COMMA = 188;
 ut.KEY_DASH = 189;
