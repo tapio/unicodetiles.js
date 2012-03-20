@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Simple Dungeon</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript" src="../unicodetiles/input.js"></script>
+	<script type="text/javascript" src="renderer-switcher.js"></script>
+	<!-- We are extending the simple-dungeon example -->
+	<script type="text/javascript" src="simple-dungeon.js"></script> 
+	<script type="text/javascript">
+		var inwards = false;
+
+		// Alternative tile function
+		function getAnotherTile(x, y) {
+			var t = "";
+			try { t = map[map.length - y - 1][x]; }
+			catch(err) { return ut.NULLTILE; }
+			if (t === '#') return WALL;
+			if (t === '.') return FLOOR;
+			return ut.NULLTILE;
+		}
+
+		function doTransition() {
+			inwards = !inwards;
+			if (inwards) {
+				eng.setTileFunc(getAnotherTile, "zoomin", 500); // Fast animation
+			} else {
+				eng.setTileFunc(getDungeonTile, "zoomout", 2000); // Slow animation
+			}
+		}
+
+		function initEffect() {
+			setInterval(doTransition, 3000);
+		}
+	</script>
+</head>
+
+<body onload="initSimpleDungeon(); initEffect(); createRendererSwitcher();">
+
+	<p class="centerer">Move around with arrow keys.</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
+
+	<a class="backlink" href="index.html">&lt;-- Back to index</a>
+
+</body>
+</html>

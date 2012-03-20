@@ -406,6 +406,10 @@ ut.Engine = function(vp, func, w, h) {
 	this.h = h;
 	this.refreshCache = true;
 	this.cacheEnabled = false;
+	this.transitionTimer = null;
+	this.transitionDuration = 0;
+	this.transition = null;
+	this.oldTileFunc = null;
 	this.cachex = 0;
 	this.cachey = 0;
 	this.tileCache = new Array(vp.h);
@@ -421,7 +425,34 @@ ut.Engine = function(vp, func, w, h) {
 	///
 	/// Parameters:
 	///   func - function taking parameters (x, y) and returning an ut.Tile
-	ut.Engine.prototype.setTileFunc = function(func) { this.tileFunc = func; };
+	///   effect - (string) (optional) name of effect to use: "zoomin" or "zoomout"
+	///   duration - (integer) (optional) how many milliseconds the transition effect should last
+	ut.Engine.prototype.setTileFunc = function(func, effect, duration) {
+		if (effect) {
+			this.transition = undefined;
+			if (typeof effect === "string") {
+				if (effect === "zoomin") this.transition = function(x, y, w, h, new_t, old_t, factor) {
+					var halfw = w * 0.5, halfh = h * 0.5;
+					x -= halfw; y -= halfh;
+					if (Math.abs(x) < halfw * factor && Math.abs(y) < halfh * factor) return new_t;
+					else return old_t;
+				};
+				else if (effect === "zoomout") this.transition = function(x, y, w, h, new_t, old_t, factor) {
+					var halfw = w * 0.5, halfh = h * 0.5;
+					x -= halfw; y -= halfh;
+					factor = 1.0 - factor;
+					if (Math.abs(x) < halfw * factor && Math.abs(y) < halfh * factor) return old_t;
+					else return new_t;
+				};
+			}
+			if (this.transition) {
+				this.transitionTimer = (new Date()).getTime();
+				this.transitionDuration = duration || 500;
+				this.oldTileFunc = this.tileFunc;
+			}
+		}
+		this.tileFunc = func;
+	};
 
 	/// Function: setMaskFunc
 	/// Sets the function to be called to fetch mask information according to coordinates.
@@ -481,7 +512,7 @@ ut.Engine = function(vp, func, w, h) {
 		// World coords of upper left corner of the viewport
 		var xx = x - this.viewport.cx;
 		var yy = y - this.viewport.cy;
-		var timeNow = new Date().getTime(); // For passing to shaderFunc
+		var timeNow = (new Date()).getTime(); // For passing to shaderFunc
 		var tile;
 		// For each tile in viewport...
 		for (var j = 0; j < this.viewport.h; ++j) {
@@ -496,6 +527,15 @@ ut.Engine = function(vp, func, w, h) {
 				// Check mask
 				} else if (this.maskFunc && !this.maskFunc(ixx, jyy)) {
 					tile = ut.NULLTILE;
+				// Check transition effect
+				} else if (this.transition) {
+					var transTime = (timeNow - this.transitionTimer) / this.transitionDuration;
+					if (transTime >= 1.0) {
+						this.transition = this.oldTileFunc = undefined;
+					} else {
+						tile = this.transition(i, j, this.viewport.w, this.viewport.h,
+							this.tileFunc(ixx, jyy), this.oldTileFunc(ixx, jyy), transTime);
+					}
 				// Check cache
 				} else if (this.cacheEnabled && !this.refreshCache) {
 					var lookupx = ixx - this.cachex;
