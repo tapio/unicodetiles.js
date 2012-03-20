@@ -453,9 +453,10 @@ ut.Engine = function(vp, func, w, h) {
 				else if (effect === "circleout") this.transition = function(x, y, w, h, new_t, old_t, factor) {
 					var halfw = w * 0.5, halfh = h * 0.5;
 					x -= halfw; y -= halfh;
+					var dx = x - halfw, dy = y - halfh;
 					factor = 1.0 - factor;
-					if (Math.abs(x) < halfw * factor && Math.abs(y) < halfh * factor) return old_t;
-					else return new_t;
+					if (x*x + y*y > (halfw*halfw + halfh*halfh) * factor) return new_t;
+					else return old_t;
 				};
 				else if (effect === "random") this.transition = function(x, y, w, h, new_t, old_t, factor) {
 					if (Math.random() > factor) return old_t;
