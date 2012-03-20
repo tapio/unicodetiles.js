@@ -421,10 +421,12 @@ ut.Engine = function(vp, func, w, h) {
 
 	/// Function: setTileFunc
 	/// Sets the function to be called with coordinates to fetch each tile.
+	/// Optionally can apply a transition effect. Effects are:
+	/// "boxin", "boxout", "circlein", "circleout", "random"
 	///
 	/// Parameters:
 	///   func - function taking parameters (x, y) and returning an ut.Tile
-	///   effect - (string) (optional) name of effect to use: "zoomin" or "zoomout"
+	///   effect - (string) (optional) name of effect to use (see above for legal values)
 	///   duration - (integer) (optional) how many milliseconds the transition effect should last
 	ut.Engine.prototype.setTileFunc = function(func, effect, duration) {
 		if (effect) {
