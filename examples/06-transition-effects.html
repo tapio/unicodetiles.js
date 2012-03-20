@@ -12,8 +12,6 @@
 	<!-- We are extending the simple-dungeon example -->
 	<script type="text/javascript" src="simple-dungeon.js"></script> 
 	<script type="text/javascript">
-		var inwards = false;
-
 		// Alternative tile function
 		function getAnotherTile(x, y) {
 			var t = "";
@@ -24,17 +22,19 @@
 			return ut.NULLTILE;
 		}
 
+		var flipflop = false;
 		function doTransition() {
-			inwards = !inwards;
-			if (inwards) {
-				eng.setTileFunc(getAnotherTile, "zoomin", 500); // Fast animation
-			} else {
-				eng.setTileFunc(getDungeonTile, "zoomout", 2000); // Slow animation
-			}
+			var effects = [ "boxin", "boxout", "circlein", "circleout", "random" ];
+			var effect = effects[Math.floor(Math.random()*effects.length)];
+			var duration = Math.floor(Math.random() * 1500) + 500;
+			flipflop = !flipflop;
+			if (flipflop) eng.setTileFunc(getAnotherTile, effect, duration);
+			else eng.setTileFunc(getDungeonTile, effect, duration);
 		}
 
 		function initEffect() {
-			setInterval(doTransition, 3000);
+			setInterval(doTransition, 2500);
+			pl.x = 14; pl.y = 10;
 		}
 	</script>
 </head>
