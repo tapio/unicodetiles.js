@@ -88,7 +88,6 @@ ut.KEY_ENTER = 13;
 ut.KEY_SHIFT = 16;
 ut.KEY_CTRL = 17;
 ut.KEY_ALT = 18;
-ut.KEY_ALT = 18;
 ut.KEY_ESCAPE = 27;
 ut.KEY_SPACE = 32;
 ut.KEY_LEFT = 37;
