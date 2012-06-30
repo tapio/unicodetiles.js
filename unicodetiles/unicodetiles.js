@@ -289,8 +289,8 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 		var tile;
 		if (x < 0 || y < 0) return;
 		for (var i = 0; i < len; ++i) {
-			if (x >= term.w) { x = 0; ++y;}
-			if (y >= term.h) return;
+			if (x >= this.w) { x = 0; ++y;}
+			if (y >= this.h) return;
 			tile = new ut.Tile(str[i], r, g, b, br, bg, bb);
 			this.unsafePut(tile, x, y);
 			++x;
