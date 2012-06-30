@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Simple Dungeon Squarified</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript" src="../unicodetiles/input.js"></script>
+	<script type="text/javascript" src="renderer-switcher.js"></script>
+	<!-- We are extending the simple-dungeon example -->
+	<script type="text/javascript" src="simple-dungeon.js"></script>
+	<script>
+		function squarify() {
+			// Squarify leaves gaps, so change the wall character
+			WALL = new ut.Tile('#', 100, 100, 100);
+			// Create new viewport with squarify enabled
+			term = new ut.Viewport(document.getElementById("game"), 25, 25, "auto", true);
+			// We also need to reset the engine since the viewport is new
+			// (because the simple-dungeon framework already initialized...)
+			eng = new ut.Engine(term, getDungeonTile, map[0].length, map.length);
+		}
+	</script>
+</head>
+
+<body onload="initSimpleDungeon(); squarify(); createRendererSwitcher();">
+
+	<p class="centerer">Move around with arrow keys.</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
+
+	<a class="backlink" href="index.html">&lt;-- Back to index</a>
+
+</body>
+</html>
