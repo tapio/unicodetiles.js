@@ -44,13 +44,13 @@ Current features
 Documentation
 -------------
 
-See [docs/html](docs/html/).
+See docs/html-subdirectory: [local link](docs/html/) | [github](http://tapio.github.com/unicodetiles.js/docs/html/)
 
 
 Examples
 --------
 
-See [examples-subdirectory](examples/).
+See examples-subdirectory: [local link](examples/) | [github](http://tapio.github.com/unicodetiles.js/examples/)
 
 
 License
