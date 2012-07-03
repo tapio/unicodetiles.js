@@ -1,3 +1,8 @@
 compiled
 docs/NaturalDocs
 docs/Readme.html
+qtwebkit/Makefile
+qtwebkit/app.o
+qtwebkit/app
+
+

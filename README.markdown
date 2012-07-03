@@ -39,6 +39,9 @@ Current features
 	- Several examples / tutorials
 		+ See examples/ subfolder
 	- Minification toolchain through [Google Closure Compiler](http://closure-compiler.appspot.com/)
+	- Boilerplate native app for removing browser dependency
+		+ Based on QtWebkit (so requires Qt)
+		+ Just compile the tiny app and drop it next to your games files - no browser needed anymore
 
 
 Documentation
