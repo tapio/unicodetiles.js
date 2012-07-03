@@ -53,6 +53,12 @@ Examples
 See examples-subdirectory: [local link](examples/) | [github](http://tapio.github.com/unicodetiles.js/examples/)
 
 
+Tests
+-----
+
+There are some, mostly performance related tests/benchmarks that you can run in the tests-subdirectory:
+[local link](tests/) | [github](http://tapio.github.com/unicodetiles.js/tests/)
+
 License
 -------
 
