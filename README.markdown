@@ -47,20 +47,20 @@ Current features
 Documentation
 -------------
 
-See docs/html-subdirectory: [local link](docs/html/) | [github](http://tapio.github.com/unicodetiles.js/docs/html/)
+See docs/html-subdirectory: [local link](docs/html/) | [online](http://tapio.github.com/unicodetiles.js/docs/html/)
 
 
 Examples
 --------
 
-See examples-subdirectory: [local link](examples/) | [github](http://tapio.github.com/unicodetiles.js/examples/)
+See examples-subdirectory: [local link](examples/) | [online](http://tapio.github.com/unicodetiles.js/examples/)
 
 
 Tests
 -----
 
 There are some, mostly performance related tests/benchmarks that you can run in the tests-subdirectory:
-[local link](tests/) | [github](http://tapio.github.com/unicodetiles.js/tests/)
+[local link](tests/) | [online](http://tapio.github.com/unicodetiles.js/tests/)
 
 License
 -------
