@@ -3,9 +3,12 @@ function createRendererSwitcher(doSwitch) {
 	// Determine the current renderer and the next one
 	var curR = term.getRendererString();
 	var nextR, pretty;
-	if (curR === "canvas") {
+	if (curR === "webgl") {
 		nextR = "dom";
 		pretty = "DOM";
+	} else if (curR === "canvas") {
+		nextR = "webgl";
+		pretty = "WebGL";
 	} else {
 		nextR = "canvas";
 		pretty = "&lt;canvas&gt;";
