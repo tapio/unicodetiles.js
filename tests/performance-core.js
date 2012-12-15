@@ -41,6 +41,8 @@ function again() {
 function init() {
 	var renderer = "auto";
 	if (location.hash.indexOf("#dom") != -1) renderer = "dom";
+	else if (location.hash.indexOf("#canvas") != -1) renderer = "canvas";
+	else if (location.hash.indexOf("#webgl") != -1) renderer = "webgl";
 
 	term = new ut.Viewport(document.getElementById("game"), 51, 25, renderer);
 	eng = new ut.Engine(term, randomTile);
@@ -51,7 +53,10 @@ function init() {
 	if (term.getRendererString() === "dom") {
 		a.innerHTML = "Switch to &lt;canvas&gt; renderer";
 		a.href = "#canvas";
-	} else {
+	} else if (term.getRendererString() === "canvas") {
+		a.innerHTML = "Switch to WebGL renderer";
+		a.href = "#webgl";
+	} else if (term.getRendererString() === "webgl") {
 		a.innerHTML = "Switch to DOM renderer";
 		a.href = "#dom";
 	}
