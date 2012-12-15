@@ -136,6 +136,8 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	this.h = h;
 	this.cx = Math.floor(this.w/2);
 	this.cy = Math.floor(this.h/2);
+	this.chars = {};
+	this.numCachedChars = 0;
 	var i, j;
 	renderer = renderer || "auto";
 	ut.viewportStyleUpdaterHack = this;
@@ -176,6 +178,33 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 				}
 			}
 		}
+	};
+
+	/// Function: buildTexture
+	/// Recreate the characters for WebGL renderer. No need to call manually.
+	this.buildTexture = function() {
+		if (!this.gl) return; // Nothing to do if not using WebGL renderer
+		// TODO
+	};
+
+	/// Function: cacheChars
+	/// Introduce characters for WebGL renderer. This is also done automatically,
+	/// but as an optimization, you can do it yourself beforehand.
+	///
+	/// Parameters:
+	///   chars - (string) the characters to cache
+	///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
+	this.cacheChars = function(chars, build) {
+		if (!this.gl) return; // Nothing to do if not using WebGL renderer
+		var changed = false;
+		for (var i = 0; i < chars.length; ++i) {
+			if (!this.chars[chars[i]]) {
+				changed = true;
+				this.chars[chars[i]] = ++this.numCachedChars;
+			}
+		}
+
+		if (changed && build === false) this.buildTexture();
 	};
 
 	/// Function: setRenderer
