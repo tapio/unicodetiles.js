@@ -9,8 +9,8 @@ You might also be interested to know that a third-party [Ruby port of this libra
 Current features
 ----------------
 * Viewport - _character grid display_
-	- Two rendering engines: faster HTML5 Canvas and slower DOM
-	- Uses Canvas by default, but automatically falls back to DOM if canvas is not supported
+	- Three rendering engines: WebGL, 2d canvas and slow DOM
+	- Automatically picks the best renderer supported by user's browser
 	- Rendering engine can be switched on-the-fly
 	- Colored characters
 	- Colored character backgrounds
