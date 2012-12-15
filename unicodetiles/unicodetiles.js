@@ -157,13 +157,13 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 		var s = window.getComputedStyle(this.elem, null);
 		this.defaultColor = s.color;
 		this.defaultBackground = s.backgroundColor;
-		if (this.ctx) {
+		if (this.ctx) { // Canvas
 			this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 			this.ctx.textBaseline = "middle";
 			this.tw = this.ctx.measureText("M").width;
 			this.th = parseInt(s.fontSize, 10);
 			this.gap = squarify ? (this.th - this.tw) : 0;
-		} else {
+		} else { // DOM
 			s = window.getComputedStyle(this.spans[0][0], null);
 			this.tw = parseInt(s.width, 10);
 			if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
@@ -181,18 +181,34 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	/// Function: setRenderer
 	/// Switch renderer at runtime. All methods fallback to "dom" if unsuccesful.
 	/// Possible values:
+	///   * "webgl" - Use WebGL through an HTML5 <canvas> element
 	///   * "canvas" - Use HTML5 <canvas> element
 	///   * "dom" - Use regular HTML element manipulation through DOM
-	///   * "auto" - Use best available, currently same as "canvas"
+	///   * "auto" - Use best available, i.e. try the above in order picking the first that works
 	this.setRenderer = function(newrenderer) {
 		// Reset stuff
 		this.elem.innerHTML = "";
-		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = undefined;
+		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = this.gl = undefined;
 		// Canvas
-		if (newrenderer === "auto" || newrenderer === "canvas") {
+		if (newrenderer === "auto" || newrenderer === "canvas" || newrenderer === "webgl") {
 			// Create the visible canvas
 			this.canvas = document.createElement("canvas");
-			if (!!(this.canvas.getContext && this.canvas.getContext('2d') && this.canvas.getContext('2d').fillText)) {
+			if (!!(this.canvas.getContext && this.canvas.getContext("experimental-webgl"))) {
+				this.elem.appendChild(this.canvas);
+				this.gl = this.canvas.getContext("experimental-webgl");
+				// Create an offscreen canvas rendering text to texture
+				this.offscreen = document.createElement("canvas");
+				this.offscreen.width = 2048;
+				this.offscreen.height = 2048;
+				this.ctx = this.offscreen.getContext("2d");
+				this.updateStyle();
+				this.canvas.width = (squarify ? this.th : this.tw) * w;
+				this.canvas.height = this.th * h;
+				// Doing this again since setting canvas w/h resets the state
+				this.updateStyle();
+				throw "WebGL renderer not yet implemented";
+				//return;
+			} else if (!!(this.canvas.getContext && this.canvas.getContext("2d") && this.canvas.getContext("2d").fillText)) {
 				this.elem.appendChild(this.canvas);
 				// Create an offscreen canvas for rendering
 				this.offscreen = document.createElement("canvas");
