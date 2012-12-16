@@ -17,6 +17,28 @@ ut.NULLCHAR = " ";
 ut.CSSCLASS = "unicodetiles";
 ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 
+ut.VERTEX_SHADER = [
+	"attribute vec2 position;",
+	"attribute vec2 texCoord;",
+	"varying vec2 vTexCoord;",
+
+	"void main() {",
+		"vTexCoord = texCoord;",
+		"gl_Position = position;",
+	"}"
+].join('\n');
+
+ut.FRAGMENT_SHADER = [
+	"precision mediump float;",
+	"uniform sampler2D uSampler;",
+	"varying vec2 vTexCoord;",
+
+	"void main() {",
+		"//texture2D(uSampler, vTexCoord);",
+		"gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0)",
+	"}"
+].join('\n');
+
 /// Class: Tile
 /// Represents a unicode character tile with various attributes.
 
