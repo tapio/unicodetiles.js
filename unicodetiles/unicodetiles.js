@@ -22,15 +22,21 @@ ut.VERTEX_SHADER = [
 	"attribute vec2 texCoord;",
 	"attribute vec3 color;",
 	"attribute vec3 bgColor;",
+	"attribute float charIndex;",
 	"uniform vec2 uResolution;",
+	"uniform vec2 uTileSize;",
 	"varying vec2 vTexCoord;",
 	"varying vec3 vColor;",
 	"varying vec3 vBgColor;",
 
 	"void main() {",
-		"vTexCoord = texCoord;",
+		"vec2 tileCounts = uResolution / uTileSize;",
+		"vec2 tileCoords = floor(vec2(mod(charIndex, tileCounts.x), charIndex / tileCounts.x));",
+		"vTexCoord = texCoord + tileCoords / tileCounts;",
+
 		"vColor = color;",
 		"vBgColor = bgColor;",
+
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
 		"gl_Position = vec4(pos.x, -pos.y, 0.0, 1.0);",
 	"}"
@@ -313,7 +319,8 @@ ut.WebGLRenderer = function(view) {
 		position: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
 		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
 		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
-		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW }
+		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
+		char:     { buffer: null, data: null, itemSize: 1, location: null, hint: gl.DYNAMIC_DRAW }
 	};
 
 	function insertQuad(arr, i, x, y, w, h) {
@@ -334,17 +341,13 @@ ut.WebGLRenderer = function(view) {
 			attrib = attribs[a];
 			attrib.data = new Float32Array(attrib.itemSize * 6 * w * h);
 		}
-		// Generate the data
+		// Generate static data
 		for (var j = 0; j < h; ++j) {
 			for (var i = 0; i < w; ++i) {
+				// Position & texCoords
 				var k = attribs.position.itemSize * 6 * (j * w + i);
 				insertQuad(attribs.position.data, k, i * this.tw, j * this.th, this.tw, this.th);
-				insertQuad(attribs.texCoord.data, k, i / w, j / h, 1 / w, 1 / h);
-				k = attribs.color.itemSize * 6 * (j * w + i);
-				for (var m = 0; m < attribs.color.itemSize * 6; ++m) {
-					attribs.color.data[k+m] = 1.0; // White default text
-					attribs.bgColor.data[k+m] = 0.0; // Black default background
-				}
+				insertQuad(attribs.texCoord.data, k, 0.0, 0.0, 1 / w, 1 / h);
 			}
 		}
 		// Upload
@@ -473,11 +476,14 @@ ut.WebGLRenderer = function(view) {
 	this.attribs.texCoord.location = gl.getAttribLocation(program, "texCoord");
 	this.attribs.color.location    = gl.getAttribLocation(program, "color");
 	this.attribs.bgColor.location  = gl.getAttribLocation(program, "bgColor");
+	this.attribs.char.location     = gl.getAttribLocation(program, "charIndex");
 
 	// Setup buffers and uniforms
 	this.initBuffers();
 	var resolutionLocation = gl.getUniformLocation(program, "uResolution");
 	gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
+	var tileSizeLocation = gl.getUniformLocation(program, "uTileSize");
+	gl.uniform2f(tileSizeLocation, this.tw, this.th);
 
 	// Setup texture
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
@@ -497,16 +503,16 @@ ut.WebGLRenderer = function(view) {
 		gl.clear(gl.COLOR_BUFFER_BIT);
 		var attribs = this.attribs;
 		var w = this.view.w, h = this.view.h;
-		// Create new data
+		// Create new tile data
 		var tiles = this.view.buffer;
 		var defaultColor = this.view.defaultColor;
 		var defaultBgColor = this.view.defaultBackground;
 		for (var j = 0; j < h; ++j) {
 			for (var i = 0; i < w; ++i) {
 				var tile = tiles[j][i];
-				var k = attribs.texCoord.itemSize * 6 * (j * w + i);
-				// Color handling
-				k = attribs.color.itemSize * 6 * (j * w + i);
+				var ch = this.charMap[tile.ch] || 0;
+				var k = attribs.color.itemSize * 6 * (j * w + i);
+				var kk = attribs.char.itemSize * 6 * (j * w + i);
 				var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
 				var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
 				var b = tile.b === undefined ? this.defaultColors.b : tile.b / 255;
@@ -521,13 +527,17 @@ ut.WebGLRenderer = function(view) {
 					attribs.bgColor.data[n+0] = br;
 					attribs.bgColor.data[n+1] = bg;
 					attribs.bgColor.data[n+2] = bb;
+					attribs.char.data[kk+m] = ch;
 				}
 			}
 		}
+		// Upload
 		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.color.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
+		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.char.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, attribs.char.data, attribs.char.hint);
 
 		var attrib = this.attribs.position;
 		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
