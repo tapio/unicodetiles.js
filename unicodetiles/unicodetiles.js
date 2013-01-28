@@ -373,6 +373,8 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	this.h = h;
 	this.renderer = null; // setRenderer() is called later
 	this.squarify = squarify;
+	this.cx = Math.floor(w/2);
+	this.cy = Math.floor(h/2);
 
 	// Add CSS class if not added already
 	if (elem.className.indexOf(ut.CSSCLASS) === -1) {
