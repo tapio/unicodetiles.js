@@ -24,19 +24,16 @@ ut.VERTEX_SHADER = [
 	"attribute vec3 bgColor;",
 	"attribute float charIndex;",
 	"uniform vec2 uResolution;",
-	"uniform vec2 uTileSize;",
+	"uniform vec2 uTileCounts;",
 	"varying vec2 vTexCoord;",
 	"varying vec3 vColor;",
 	"varying vec3 vBgColor;",
 
 	"void main() {",
-		"vec2 tileCounts = uResolution / uTileSize;",
-		"vec2 tileCoords = floor(vec2(mod(charIndex, tileCounts.x), charIndex / tileCounts.x));",
-		"vTexCoord = texCoord + tileCoords / tileCounts;",
-
+		"vec2 tileCoords = floor(vec2(mod(charIndex, uTileCounts.x), charIndex / uTileCounts.x));",
+		"vTexCoord = texCoord + tileCoords / uTileCounts;",
 		"vColor = color;",
 		"vBgColor = bgColor;",
-
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
 		"gl_Position = vec4(pos.x, -pos.y, 0.0, 1.0);",
 	"}"
@@ -482,8 +479,8 @@ ut.WebGLRenderer = function(view) {
 	this.initBuffers();
 	var resolutionLocation = gl.getUniformLocation(program, "uResolution");
 	gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
-	var tileSizeLocation = gl.getUniformLocation(program, "uTileSize");
-	gl.uniform2f(tileSizeLocation, this.tw, this.th);
+	var tileCountsLocation = gl.getUniformLocation(program, "uTileCounts");
+	gl.uniform2f(tileCountsLocation, this.view.w, this.view.h);
 
 	// Setup texture
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
