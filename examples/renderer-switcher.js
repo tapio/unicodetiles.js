@@ -1,3 +1,4 @@
+/*global term */
 
 function createRendererSwitcher(doSwitch) {
 	// Determine the current renderer and the next one

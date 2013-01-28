@@ -2,6 +2,8 @@
 // It naïvely shoots a beam at every direction.
 // Makes use of the ut.Engine's mask function callback.
 
+/*global term, eng */
+
 var maskBuffer;
 var maskOrigin = { x: 0, y: 0 };
 
@@ -42,7 +44,7 @@ function initFOV() {
 }
 
 // Calculates a fresh field of view
-updateFOV = function(x, y) {
+var updateFOV = function(x, y) {
 	// Clear the mask buffer
 	for (var j = 0; j < term.h; ++j)
 		for (var i = 0; i < term.w; ++i)

@@ -3,7 +3,7 @@
 /// All coordinates are assumed to be integers - behaviour is undefined
 /// if you feed in floats (or anything other) as x and y (or similar) parameters.
 
-/*jshint browser:true devel:true trailing:true latedef:true */
+/*jshint browser:true devel:true trailing:true latedef:true undef:true unused:true newcap:true */
 
 /// Namespace: ut
 /// Container namespace.
@@ -143,15 +143,16 @@ ut.viewportStyleUpdaterHack = null;
 /// Class: DOMRenderer
 /// Renders the <Viewport> into DOM elements.
 ut.DOMRenderer = function(view) {
+	"use strict";
 	this.view = view;
 
 	// Create a matrix of <span> elements, cache references
 	this.spans = new Array(view.h);
 	this.colors = new Array(view.h);
-	for (j = 0; j < view.h; ++j) {
+	for (var j = 0; j < view.h; ++j) {
 		this.spans[j] = new Array(view.w);
 		this.colors[j] = new Array(view.w);
-		for (i = 0; i < view.w; ++i) {
+		for (var i = 0; i < view.w; ++i) {
 			this.spans[j][i] = document.createElement("div");
 			view.elem.appendChild(this.spans[j][i]);
 		}
@@ -214,6 +215,7 @@ ut.DOMRenderer = function(view) {
 /// Class: CanvasRenderer
 /// Renders the <Viewport> into an HTML5 <canvas> element.
 ut.CanvasRenderer = function(view) {
+	"use strict";
 	this.view = view;
 	this.canvas = document.createElement("canvas");
 	if (!this.canvas.getContext) throw("Canvas not supported");
@@ -283,6 +285,7 @@ ut.CanvasRenderer = function(view) {
 /// Class: WebGLRenderer
 /// Renders the <Viewport> with WebGL.
 ut.WebGLRenderer = function(view) {
+	"use strict";
 	this.view = view;
 	this.canvas = document.createElement("canvas");
 	// Try to fetch the context
@@ -306,8 +309,8 @@ ut.WebGLRenderer = function(view) {
 	this.offscreen.height = 2048;
 	this.ctx = this.offscreen.getContext("2d");
 	this.updateStyle();
-	this.canvas.width = (view.squarify ? this.th : this.tw) * w;
-	this.canvas.height = this.th * h;
+	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
+	this.canvas.height = this.th * view.h;
 	// Doing this again since setting canvas w/h resets the state
 	this.updateStyle();
 	this.chars = {};

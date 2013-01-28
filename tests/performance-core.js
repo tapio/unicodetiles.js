@@ -1,3 +1,4 @@
+/*global ut */
 var chars = "☠☃⚙☻♞☭✈✟✂✯";
 var term, eng; // Can't be initialized yet because DOM is not ready
 var interval1, interval2;
@@ -5,7 +6,7 @@ var start_time;
 var iterations = 0;
 
 // Returns a random tile
-randomTile = function(x, y) {
+var randomTile = function(x, y) {
 	var r = Math.floor(Math.random() * 255);
 	var g = Math.floor(Math.random() * 255);
 	var b = Math.floor(Math.random() * 255);
@@ -14,7 +15,7 @@ randomTile = function(x, y) {
 };
 
 // One iteration
-tick = function() {
+var tick = function() {
 	eng.update();
 	term.render();
 	++iterations;

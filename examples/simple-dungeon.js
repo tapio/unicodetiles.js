@@ -1,3 +1,4 @@
+/*global ut */
 var term, eng; // Can't be initialized yet because DOM is not ready
 var pl = { x: 3, y: 2 }; // Player position
 var updateFOV; // For some of the examples
