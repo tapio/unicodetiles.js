@@ -435,11 +435,12 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	/// Gets the currently used renderer.
 	///
 	/// Returns:
-	///   One of "webgl", "canvas", "dom".
+	///   One of "webgl", "canvas", "dom", "".
 	ut.Viewport.prototype.getRendererString = function() {
 		if (this.renderer instanceof ut.WebGLRenderer) return "webgl";
 		if (this.renderer instanceof ut.CanvasRenderer) return "canvas";
-		return "dom";
+		if (this.renderer instanceof ut.DOMRenderer) return "dom";
+		return "";
 	};
 
 	/// Function: put
