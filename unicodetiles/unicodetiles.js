@@ -23,11 +23,7 @@ ut.VERTEX_SHADER = [
 	"uniform vec2 uResolution;",
 	"varying vec2 vTexCoord;",
 
-"varying vec2 pos;",
-
 	"void main() {",
-
-"pos = position;",
 		"vTexCoord = texCoord;",
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
 		"gl_Position = vec4(pos.x, -pos.y, 0.0, 1.0);",
@@ -38,12 +34,9 @@ ut.FRAGMENT_SHADER = [
 	"precision mediump float;",
 	"uniform sampler2D uFont;",
 	"varying vec2 vTexCoord;",
-"varying vec2 pos;",
 
 	"void main() {",
 		"vec4 color = texture2D(uFont, vTexCoord);",
-		"color.r += pos.x/400.0;",
-		"color.b += pos.y/400.0;",
 		"gl_FragColor = color;",
 	"}"
 ].join('\n');
@@ -321,7 +314,7 @@ ut.WebGLRenderer = function(view) {
 	this.initBuffers = function() {
 		// Generate data
 		var w = this.view.w, h = this.view.h;
-/*		this.positions = new Float32Array(2 * 6 * w * h);
+		this.positions = new Float32Array(2 * 6 * w * h);
 		this.texCoords = new Float32Array(2 * 6 * w * h);
 		for (var j = 0; j < h; ++j) {
 			for (var i = 0; i < w; ++i) {
@@ -329,13 +322,7 @@ ut.WebGLRenderer = function(view) {
 				insertQuad(this.positions, k, i * this.tw, j * this.th, this.tw, this.th);
 				insertQuad(this.texCoords, k, 0, 0, 1, 1);
 			}
-		}*/
-
-		this.positions = new Float32Array(2 * 6);
-		this.texCoords = new Float32Array(2 * 6);
-		insertQuad(this.positions, 0, 0, 0, this.canvas.width*0.75, this.canvas.height*0.75);
-		insertQuad(this.texCoords, 0, 0, 0, 1, 1);
-
+		}
 		// Upload positions
 		if (this.positionBuffer) gl.deleteBuffer(this.positionBuffer);
 		this.positionBuffer = gl.createBuffer();
@@ -432,7 +419,6 @@ ut.WebGLRenderer = function(view) {
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	//gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
@@ -462,13 +448,6 @@ ut.WebGLRenderer = function(view) {
 
 	this.render = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
-
-		/*gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-		gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
-
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-		gl.vertexAttribPointer(this.locations.texCoord, 2, gl.FLOAT, false, 0, 0);*/
-
 		gl.drawArrays(gl.TRIANGLES, 0, this.positions.length / 2);
 	};
 };
