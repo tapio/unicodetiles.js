@@ -3,7 +3,7 @@
 /// All coordinates are assumed to be integers - behaviour is undefined
 /// if you feed in floats (or anything other) as x and y (or similar) parameters.
 
-/*jshint browser:true trailing:true latedef:true */
+/*jshint browser:true devel:true trailing:true latedef:true */
 
 /// Namespace: ut
 /// Container namespace.
@@ -138,70 +138,180 @@ ut.NULLTILE = new ut.Tile();
 
 ut.viewportStyleUpdaterHack = null;
 
-/// Class: Viewport
-/// The tile engine viewport / renderer / window.
 
-/// Constructor: Viewport
-/// Constructs a new Viewport object.
-/// If you wish to display a player character at the center, you should use odd sizes.
-///
-/// Parameters:
-///   elem - the DOM element which shall be transformed into the tile engine
-///   w - (integer) width in tiles
-///   h - (integer) height in tiles
-///   renderer - (optional) choose rendering engine, see <Viewport.setRenderer>, defaults to "auto".
-///   squarify - (optional) set to true to force the tiles square; may break some box drawing
-ut.Viewport = function(elem, w, h, renderer, squarify) {
-	"use strict";
-	this.elem = elem;
-	this.elem.innerHTML = "";
-	this.w = w;
-	this.h = h;
-	this.cx = Math.floor(this.w/2);
-	this.cy = Math.floor(this.h/2);
-	this.chars = {};
-	this.numCachedChars = 0;
-	var i, j;
-	renderer = renderer || "auto";
-	ut.viewportStyleUpdaterHack = this;
 
-	// Add CSS class if not added already
-	if (elem.className.indexOf(ut.CSSCLASS) === -1) {
-		if (elem.className.length === 0) elem.className = ut.CSSCLASS;
-		else elem.className += " " + ut.CSSCLASS;
+/// Class: DOMRenderer
+/// Renders the <Viewport> into DOM elements.
+ut.DOMRenderer = function(view) {
+	this.view = view;
+
+	// Create a matrix of <span> elements, cache references
+	this.spans = new Array(view.h);
+	this.colors = new Array(view.h);
+	for (j = 0; j < view.h; ++j) {
+		this.spans[j] = new Array(view.w);
+		this.colors[j] = new Array(view.w);
+		for (i = 0; i < view.w; ++i) {
+			this.spans[j][i] = document.createElement("div");
+			view.elem.appendChild(this.spans[j][i]);
+		}
+		// Line break
+		this.spans[j].push(document.createElement("br"));
+		view.elem.appendChild(this.spans[j][view.w]);
 	}
+	ut.viewportStyleUpdaterHack = this;
+	setTimeout(function() { ut.viewportStyleUpdaterHack.updateStyle(); }, 0);
 
-	// Create two 2-dimensional array to hold the viewport tiles
-	this.buffer = new Array(h);
-	for (j = 0; j < h; ++j)
-		this.buffer[j] = new Array(w);
-
-	/// Function: updateStyle
-	/// If the style of the parent element is modified, this needs to be called.
-	this.updateStyle = function() {
-		var s = window.getComputedStyle(this.elem, null);
-		this.defaultColor = s.color;
-		this.defaultBackground = s.backgroundColor;
-		if (this.ctx) { // Canvas
-			this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
-			this.ctx.textBaseline = "middle";
-			this.tw = this.ctx.measureText("M").width;
-			this.th = parseInt(s.fontSize, 10);
-			this.gap = squarify ? (this.th - this.tw) : 0;
-		} else { // DOM
-			s = window.getComputedStyle(this.spans[0][0], null);
-			this.tw = parseInt(s.width, 10);
-			if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
-			this.th = parseInt(s.height, 10);
-			this.gap = squarify ? (this.th - this.tw) : 0;
-			for (j = 0; j < this.h; ++j) {
-				for (i = 0; i < this.w; ++i) {
-					this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
-					this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
-				}
+	this.updateStyle = function(s) {
+		s = window.getComputedStyle(this.spans[0][0], null);
+		this.tw = parseInt(s.width, 10);
+		if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
+		this.th = parseInt(s.height, 10);
+		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+		var w = this.view.w, h = this.view.h;
+		for (j = 0; j < h; ++j) {
+			for (i = 0; i < w; ++i) {
+				this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
+				this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
 			}
 		}
 	};
+
+	this.clear = function() {
+		for (var j = 0; j < this.h; ++j) {
+			for (var i = 0; i < this.w; ++i) {
+				this.colors[j][i] = "";
+			}
+		}
+	};
+
+	this.render = function() {
+		var w = this.view.w, h = this.view.h;
+		var buffer = this.view.buffer;
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				var tile = buffer[j][i];
+				var span = this.spans[j][i];
+				// Check and update colors
+				var fg = tile.getColorRGB();
+				var bg = tile.getBackgroundRGB();
+				var colorHash = fg + bg;
+				if (colorHash !== this.colors[j][i]) {
+					this.colors[j][i] = colorHash;
+					span.style.color = fg;
+					span.style.backgroundColor = bg;
+				}
+				// Check and update character
+				var ch = tile.getChar();
+				if (ch !== span.innerHTML)
+					span.innerHTML = ch;
+			}
+		}
+	};
+};
+
+
+/// Class: CanvasRenderer
+/// Renders the <Viewport> into an HTML5 <canvas> element.
+ut.CanvasRenderer = function(view) {
+	this.view = view;
+	this.canvas = document.createElement("canvas");
+	if (!this.canvas.getContext) throw("Canvas not supported");
+	this.ctx2 = this.canvas.getContext("2d");
+	if (!this.ctx2 || !this.ctx2.fillText) throw("Canvas not supported");
+	view.elem.appendChild(this.canvas);
+
+	this.updateStyle = function(s) {
+		s = s || window.getComputedStyle(this.view.elem, null);
+		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
+		this.ctx.textBaseline = "middle";
+		this.tw = this.ctx.measureText("M").width;
+		this.th = parseInt(s.fontSize, 10);
+		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+	};
+
+	// Create an offscreen canvas for rendering
+	this.offscreen = document.createElement("canvas");
+	this.ctx = this.offscreen.getContext("2d");
+	this.updateStyle();
+	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
+	this.canvas.height = this.th * view.h;
+	this.offscreen.width = this.canvas.width;
+	this.offscreen.height = this.canvas.height;
+	// Doing this again since setting canvas w/h resets the state
+	this.updateStyle();
+
+	this.clear = function() { /* No op */ };
+
+	this.render = function() {
+		var tile, ch, fg, bg, x, y;
+		var view = this.view, buffer = this.view.buffer;
+		var w = view.w, h = view.h;
+		var hth = (0.5*this.th)|0;
+		var hgap = (0.5*this.gap); // Squarification
+		// Clearing with one big rect is much faster than with individual char rects
+		this.ctx.fillStyle = view.defaultBackground;
+		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+		y = hth; // half because textBaseline is middle
+		for (var j = 0; j < h; ++j) {
+			x = 0;
+			for (var i = 0; i < w; ++i) {
+				tile = buffer[j][i];
+				ch = tile.ch;
+				fg = tile.getColorRGB();
+				bg = tile.getBackgroundRGB();
+				// Only render background if the color is non-default
+				if (bg.length && bg !== view.defaultBackground) {
+					this.ctx.fillStyle = bg;
+					this.ctx.fillRect(x, y-hth, this.tw+this.gap, this.th);
+				}
+				// Do not attempt to render empty char
+				if (ch.length) {
+					if (!fg.length) fg = view.defaultColor;
+					this.ctx.fillStyle = fg;
+					this.ctx.fillText(ch, x+hgap, y);
+				}
+				x += this.tw + this.gap;
+			}
+			y += this.th;
+		}
+		this.ctx2.drawImage(this.offscreen, 0, 0);
+	};
+};
+
+
+/// Class: WebGLRenderer
+/// Renders the <Viewport> with WebGL.
+ut.WebGLRenderer = function(view) {
+	this.view = view;
+	this.canvas = document.createElement("canvas");
+	// Try to fetch the context
+	if (!this.canvas.getContext) throw("Canvas not supported");
+	this.gl = this.canvas.getContext("experimental-webgl");
+	if (!this.gl) throw("WebGL not supported");
+	view.elem.appendChild(this.canvas);
+
+	this.updateStyle = function(s) {
+		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
+		this.ctx.textBaseline = "middle";
+		this.tw = this.ctx.measureText("M").width;
+		this.th = parseInt(s.fontSize, 10);
+		this.gap = view.squarify ? (this.th - this.tw) : 0;
+	};
+
+	// Create an offscreen canvas for rendering text to texture
+	if (!this.offscreen)
+		this.offscreen = document.createElement("canvas");
+	this.offscreen.width = 2048;
+	this.offscreen.height = 2048;
+	this.ctx = this.offscreen.getContext("2d");
+	this.updateStyle();
+	this.canvas.width = (view.squarify ? this.th : this.tw) * w;
+	this.canvas.height = this.th * h;
+	// Doing this again since setting canvas w/h resets the state
+	this.updateStyle();
+	this.chars = {};
+	this.numCachedChars = 0;
 
 	/// Function: buildTexture
 	/// Recreate the characters for WebGL renderer. No need to call manually.
@@ -230,63 +340,56 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 		if (changed && build === false) this.buildTexture();
 	};
 
-	this.initWebGLRenderer = function() {
-		this.canvas = document.createElement("canvas");
-		// Try to fetch the context
-		if (!this.canvas.getContext) return false;
-		this.gl = this.canvas.getContext("experimental-webgl");
-		if (!this.gl) return false;
-		this.elem.appendChild(this.canvas);
-		// Create an offscreen canvas for rendering text to texture
-		if (!this.offscreen)
-			this.offscreen = document.createElement("canvas");
-		this.offscreen.width = 2048;
-		this.offscreen.height = 2048;
-		this.ctx = this.offscreen.getContext("2d");
-		this.updateStyle();
-		this.canvas.width = (squarify ? this.th : this.tw) * w;
-		this.canvas.height = this.th * h;
-		// Doing this again since setting canvas w/h resets the state
-		this.updateStyle();
-		return true;
-	};
+	this.clear = function() { /* No op */ };
 
-	this.initCanvasRenderer = function() {
-		this.canvas = document.createElement("canvas");
-		if (!this.canvas.getContext) return false;
-		this.ctx2 = this.canvas.getContext("2d");
-		if (!this.ctx2 || !this.ctx2.fillText) return false;
-		this.elem.appendChild(this.canvas);
-		// Create an offscreen canvas for rendering
-		this.offscreen = document.createElement("canvas");
-		this.ctx = this.offscreen.getContext("2d");
-		this.updateStyle();
-		this.canvas.width = (squarify ? this.th : this.tw) * w;
-		this.canvas.height = this.th * h;
-		this.offscreen.width = this.canvas.width;
-		this.offscreen.height = this.canvas.height;
-		// Doing this again since setting canvas w/h resets the state
-		this.updateStyle();
-		return true;
+	this.render = function() {
+		// TODO
 	};
+};
 
-	this.initDOMRenderer = function() {
-		// Create a matrix of <span> elements, cache references
-		this.spans = new Array(h);
-		this.colors = new Array(h);
-		for (j = 0; j < this.h; ++j) {
-			this.spans[j] = new Array(w);
-			this.colors[j] = new Array(w);
-			for (i = 0; i < this.w; ++i) {
-				this.spans[j][i] = document.createElement("div");
-				this.elem.appendChild(this.spans[j][i]);
-			}
-			// Line break
-			this.spans[j].push(document.createElement("br"));
-			this.elem.appendChild(this.spans[j][this.w]);
-		}
-		setTimeout(function() { ut.viewportStyleUpdaterHack.updateStyle(); }, 0);
-		return true;
+
+
+/// Class: Viewport
+/// The tile engine viewport / renderer / window.
+
+/// Constructor: Viewport
+/// Constructs a new Viewport object.
+/// If you wish to display a player character at the center, you should use odd sizes.
+///
+/// Parameters:
+///   elem - the DOM element which shall be transformed into the tile engine
+///   w - (integer) width in tiles
+///   h - (integer) height in tiles
+///   renderer - (optional) choose rendering engine, see <Viewport.setRenderer>, defaults to "auto".
+///   squarify - (optional) set to true to force the tiles square; may break some box drawing
+ut.Viewport = function(elem, w, h, renderer, squarify) {
+	"use strict";
+	this.elem = elem;
+	this.elem.innerHTML = "";
+	this.w = w;
+	this.h = h;
+	this.renderer = null; // setRenderer() is called later
+	this.squarify = squarify;
+
+	// Add CSS class if not added already
+	if (elem.className.indexOf(ut.CSSCLASS) === -1) {
+		if (elem.className.length === 0) elem.className = ut.CSSCLASS;
+		else elem.className += " " + ut.CSSCLASS;
+	}
+
+	// Create two 2-dimensional array to hold the viewport tiles
+	this.buffer = new Array(h);
+	for (var j = 0; j < h; ++j)
+		this.buffer[j] = new Array(w);
+
+	/// Function: updateStyle
+	/// If the style of the parent element is modified, this needs to be called.
+	this.updateStyle = function(updateRenderer) {
+		var s = window.getComputedStyle(this.elem, null);
+		this.defaultColor = s.color;
+		this.defaultBackground = s.backgroundColor;
+		if (updateRenderer !== false)
+			this.renderer.updateStyle(s);
 	};
 
 	/// Function: setRenderer
@@ -297,31 +400,42 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	///   * "dom" - Use regular HTML element manipulation through DOM
 	///   * "auto" - Use best available, i.e. try the above in order picking the first that works
 	this.setRenderer = function(newrenderer) {
-		// Reset stuff
 		this.elem.innerHTML = "";
-		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = this.gl = undefined;
-		// Try renderers
 		if (newrenderer === "auto" || newrenderer === "webgl") {
-			if (this.initWebGLRenderer()) return;
-			newrenderer = "canvas";
+			try {
+				this.renderer = new ut.WebGLRenderer(this);
+			} catch (e) {
+				console.log(e);
+				newrenderer = "canvas";
+				this.elem.innerHTML = "";
+			}
 		}
 		if (newrenderer === "canvas") {
-			if (this.initCanvasRenderer()) return;
+			try {
+				this.renderer = new ut.CanvasRenderer(this);
+			} catch (e) {
+				console.log(e);
+				newrenderer = "dom";
+				this.elem.innerHTML = "";
+			}
 		}
-		this.initDOMRenderer();
+		if (newrenderer === "dom") {
+			this.renderer = new ut.DOMRenderer(this);
+		}
+		this.updateStyle(false);
 	};
 
-	this.setRenderer(renderer);
+	this.setRenderer(renderer || "auto");
 };
 
 	/// Function: getRendererString
 	/// Gets the currently used renderer.
 	///
 	/// Returns:
-	///   "canvas" if the HTML5 <canvas> renderer is used, "dom" otherwise.
+	///   One of "webgl", "canvas", "dom".
 	ut.Viewport.prototype.getRendererString = function() {
-		if (this.ctx && this.ctx2 && this.canvas && this.offscreen)
-			return "canvas";
+		if (this.renderer instanceof ut.WebGLRenderer) return "webgl";
+		if (this.renderer instanceof ut.CanvasRenderer) return "canvas";
 		return "dom";
 	};
 
@@ -398,69 +512,15 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 		for (var j = 0; j < this.h; ++j) {
 			for (var i = 0; i < this.w; ++i) {
 				this.buffer[j][i] = ut.NULLTILE;
-				if (!this.ctx) this.colors[j][i] = "";
 			}
 		}
-	};
-
-	/// Function: renderCanvas
-	/// Renders the buffer to <canvas> element created in constructor.
-	ut.Viewport.prototype.renderCanvas = function() {
-		var tile, ch, fg, bg, x, y;
-		var hth = (0.5*this.th)|0;
-		var hgap = (0.5*this.gap); // Squarification
-		// Clearing with one big rect is much faster than with individual char rects
-		this.ctx.fillStyle = this.defaultBackground;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		y = hth; // half because textBaseline is middle
-		for (var j = 0; j < this.h; ++j) {
-			x = 0;
-			for (var i = 0; i < this.w; ++i) {
-				tile = this.buffer[j][i];
-				ch = tile.ch;
-				fg = tile.getColorRGB();
-				bg = tile.getBackgroundRGB();
-				// Only render background if the color is non-default
-				if (bg.length && bg !== this.defaultBackground) {
-					this.ctx.fillStyle = bg;
-					this.ctx.fillRect(x, y-hth, this.tw+this.gap, this.th);
-				}
-				// Do not attempt to render empty char
-				if (ch.length) {
-					if (!fg.length) fg = this.defaultColor;
-					this.ctx.fillStyle = fg;
-					this.ctx.fillText(ch, x+hgap, y);
-				}
-				x += this.tw + this.gap;
-			}
-			y += this.th;
-		}
-		this.ctx2.drawImage(this.offscreen, 0, 0);
+		this.renderer.clear();
 	};
 
 	/// Function: render
 	/// Renders the buffer as html to the element specified at construction.
 	ut.Viewport.prototype.render = function() {
-		if (this.ctx) { this.renderCanvas(); return; }
-		for (var j = 0; j < this.h; ++j) {
-			for (var i = 0; i < this.w; ++i) {
-				var tile = this.buffer[j][i];
-				var span = this.spans[j][i];
-				// Check and update colors
-				var fg = tile.getColorRGB();
-				var bg = tile.getBackgroundRGB();
-				var colorHash = fg + bg;
-				if (colorHash !== this.colors[j][i]) {
-					this.colors[j][i] = colorHash;
-					span.style.color = fg;
-					span.style.backgroundColor = bg;
-				}
-				// Check and update character
-				var ch = tile.getChar();
-				if (ch !== span.innerHTML)
-					span.innerHTML = ch;
-			}
-		}
+		this.renderer.render();
 	};
 
 
