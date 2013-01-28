@@ -305,11 +305,13 @@ ut.WebGLRenderer = function(view) {
 	var gl = this.gl;
 	view.elem.appendChild(this.canvas);
 
+	this.defaultColors = { r: 1.0, g: 1.0, b: 1.0, br: 0.0, bg: 0.0, bb: 0.0 };
+
 	this.attribs = {
 		position: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
-		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
-		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.STATIC_DRAW },
-		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.STATIC_DRAW }
+		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.DYNAMIC_DRAW },
+		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
+		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW }
 	};
 
 	function insertQuad(arr, i, x, y, w, h) {
@@ -368,6 +370,14 @@ ut.WebGLRenderer = function(view) {
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
 		this.gap = view.squarify ? (this.th - this.tw) : 0;
+		var color = s.color.match(/\d+/g);
+		var bgColor = s.backgroundColor.match(/\d+/g);
+		this.defaultColors.r = parseInt(color[0], 10) / 255;
+		this.defaultColors.g = parseInt(color[1], 10) / 255;
+		this.defaultColors.b = parseInt(color[2], 10) / 255;
+		this.defaultColors.br = parseInt(bgColor[0], 10) / 255;
+		this.defaultColors.bg = parseInt(bgColor[1], 10) / 255;
+		this.defaultColors.bb = parseInt(bgColor[2], 10) / 255;
 	};
 
 	// Create an offscreen canvas for rendering text to texture
@@ -464,6 +474,40 @@ ut.WebGLRenderer = function(view) {
 
 	this.render = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
+		var attribs = this.attribs;
+		var w = this.view.w, h = this.view.h;
+		// Create new data
+		var tiles = this.view.buffer;
+		var defaultColor = this.view.defaultColor;
+		var defaultBgColor = this.view.defaultBackground;
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				var tile = tiles[j][i];
+				var k = attribs.texCoord.itemSize * 6 * (j * w + i);
+				//insertQuad(attribs.texCoord.data, k, 0, 0, 1, 1);
+				k = attribs.color.itemSize * 6 * (j * w + i);
+				var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
+				var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
+				var b = tile.b === undefined ? this.defaultColors.b : tile.b / 255;
+				var br = tile.br === undefined ? this.defaultColors.br : tile.br / 255;
+				var bg = tile.bg === undefined ? this.defaultColors.bg : tile.bg / 255;
+				var bb = tile.bb === undefined ? this.defaultColors.bb : tile.bb / 255;
+				for (var m = 0; m < 6; ++m) {
+					var n = k + m * attribs.color.itemSize;
+					attribs.color.data[n+0] = r;
+					attribs.color.data[n+1] = g;
+					attribs.color.data[n+2] = b;
+					attribs.bgColor.data[n+0] = br;
+					attribs.bgColor.data[n+1] = bg;
+					attribs.bgColor.data[n+2] = bb;
+				}
+			}
+		}
+		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.color.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
+		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
+		gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
+
 		var attrib = this.attribs.position;
 		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
 	};
