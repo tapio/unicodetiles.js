@@ -20,23 +20,29 @@ ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 ut.VERTEX_SHADER = [
 	"attribute vec2 position;",
 	"attribute vec2 texCoord;",
-	"uniform vec2 uViewportSize;",
+	"uniform vec2 uResolution;",
 	"varying vec2 vTexCoord;",
 
+"varying vec2 pos;",
+
 	"void main() {",
+
+"pos = position;",
 		"vTexCoord = texCoord;",
-		"gl_Position = vec4(position / uViewportSize * 2.0 - 1.0, 0.0, 1.0);",
+		"gl_Position = vec4(position / uResolution * 2.0 - 1.0, 0.0, 1.0);",
 	"}"
 ].join('\n');
 
 ut.FRAGMENT_SHADER = [
 	"precision mediump float;",
-	"uniform sampler2D uSampler;",
+	"uniform sampler2D uFont;",
 	"varying vec2 vTexCoord;",
+"varying vec2 pos;",
 
 	"void main() {",
-		"//texture2D(uSampler, vTexCoord);",
-		"gl_FragColor = vec4(1.0, 0.0, 0.0, 1.0)",
+		"vec4 color = texture2D(uFont, vTexCoord);",
+		"color.r = pos.x/400.0;",
+		"gl_FragColor = color;",
 	"}"
 ].join('\n');
 
@@ -292,11 +298,62 @@ ut.WebGLRenderer = function(view) {
 	if (!this.canvas.getContext) throw("Canvas not supported");
 	this.gl = this.canvas.getContext("experimental-webgl");
 	if (!this.gl) throw("WebGL not supported");
+	var gl = this.gl;
 	view.elem.appendChild(this.canvas);
 
+	this.positions = null;
+	this.texCoords = null;
+	this.positionBuffer = null;
+	this.texCoordBuffer = null;
+
+	function insertQuad(arr, i, x, y, w, h) {
+		var x1 = x, y1 = y, x2 = x + w, y2 = y + h;
+		arr[  i] = x1; arr[++i] = y1;
+		arr[++i] = x2; arr[++i] = y1;
+		arr[++i] = x1; arr[++i] = y2;
+		arr[++i] = x1; arr[++i] = y2;
+		arr[++i] = x2; arr[++i] = y1;
+		arr[++i] = x2; arr[++i] = y2;
+	}
+
+	this.initBuffers = function() {
+		// Generate data
+		var w = this.view.w, h = this.view.h;
+		this.positions = new Float32Array(2 * 6 * w * h);
+		this.texCoords = new Float32Array(2 * 6 * w * h);
+		for (var j = 0; j < h; ++j) {
+			for (var i = 0; i < w; ++i) {
+				var k = 12 * (j * w + i);
+				insertQuad(this.positions, k, i * this.tw, j * this.th, this.tw, this.th);
+				insertQuad(this.texCoords, k, 0, 0, 1, 1);
+			}
+		}
+		// Upload positions
+		if (this.positionBuffer) gl.deleteBuffer(this.positionBuffer);
+		this.positionBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
+		gl.enableVertexAttribArray(this.locations.position);
+		gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
+		// Upload texCoords
+		if (this.texCoordBuffer) gl.deleteBuffer(this.texCoordBuffer);
+		this.texCoordBuffer = gl.createBuffer();
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+		gl.bufferData(gl.ARRAY_BUFFER, this.texCoords, gl.STATIC_DRAW);
+		gl.enableVertexAttribArray(this.locations.texCoord);
+		gl.vertexAttribPointer(this.locations.texCoord, 2, gl.FLOAT, false, 0, 0);
+	};
+
+	this.buildTexture = function() {
+		// TODO
+		this.ctx.fillText("@", this.offscreen.width/2, this.offscreen.height/2);
+	};
+
 	this.updateStyle = function(s) {
+		s = s || window.getComputedStyle(this.view.elem, null);
 		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 		this.ctx.textBaseline = "middle";
+		this.ctx.fillStyle = "#ffffff";
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
 		this.gap = view.squarify ? (this.th - this.tw) : 0;
@@ -305,9 +362,13 @@ ut.WebGLRenderer = function(view) {
 	// Create an offscreen canvas for rendering text to texture
 	if (!this.offscreen)
 		this.offscreen = document.createElement("canvas");
-	this.offscreen.width = 2048;
-	this.offscreen.height = 2048;
+	this.offscreen.width = 32;
+	this.offscreen.height = 32;
+	this.offscreen.style.position = "absolute";
+	this.offscreen.style.top = "0px";
+	this.offscreen.style.left = "0px";
 	this.ctx = this.offscreen.getContext("2d");
+	// WebGL drawing canvas
 	this.updateStyle();
 	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
 	this.canvas.height = this.th * view.h;
@@ -316,12 +377,58 @@ ut.WebGLRenderer = function(view) {
 	this.chars = {};
 	this.numCachedChars = 0;
 
-	/// Function: buildTexture
-	/// Recreate the characters for WebGL renderer. No need to call manually.
-	this.buildTexture = function() {
-		if (!this.gl) return; // Nothing to do if not using WebGL renderer
-		// TODO
+	// Debug offscreen
+	//view.elem.appendChild(this.offscreen);
+
+	gl.viewport(0, 0, this.canvas.width, this.canvas.height);
+
+	// Setup GLSL
+	function compileShader(type, source) {
+		var shader = gl.createShader(type);
+		gl.shaderSource(shader, source);
+		gl.compileShader(shader);
+		var ok = gl.getShaderParameter(shader, gl.COMPILE_STATUS);
+		if (!ok) {
+			var msg = "Error compiling shader: " + gl.getShaderInfoLog(shader);
+			gl.deleteShader(shader);
+			throw msg;
+		}
+		return shader;
+	}
+	var vertexShader = compileShader(gl.VERTEX_SHADER, ut.VERTEX_SHADER);
+	var fragmentShader = compileShader(gl.FRAGMENT_SHADER, ut.FRAGMENT_SHADER);
+	var program = gl.createProgram();
+	gl.attachShader(program, vertexShader);
+	gl.attachShader(program, fragmentShader);
+	gl.linkProgram(program);
+	gl.deleteShader(vertexShader);
+	gl.deleteShader(fragmentShader);
+	var ok = gl.getProgramParameter(program, gl.LINK_STATUS);
+	if (!ok) {
+		var msg = "Error linking program: " + gl.getProgramInfoLog(program);
+		gl.deleteProgram(program);
+		throw msg;
+	}
+	gl.useProgram(program);
+
+	this.locations = {
+		position: gl.getAttribLocation(program, "position"),
+		texCoord: gl.getAttribLocation(program, "texCoord"),
+		resolution: gl.getUniformLocation(program, "uResolution"),
+		font: gl.getUniformLocation(program, "uFont")
 	};
+
+	// Setup buffers and uniforms
+	this.initBuffers();
+	gl.uniform2f(this.locations.resolution, this.canvas.width, this.canvas.height);
+
+	// Setup texture
+	var texture = gl.createTexture();
+	gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
+	gl.bindTexture(gl.TEXTURE_2D, texture);
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 
 	/// Function: cacheChars
 	/// Introduce characters for WebGL renderer. This is also done automatically,
@@ -346,7 +453,15 @@ ut.WebGLRenderer = function(view) {
 	this.clear = function() { /* No op */ };
 
 	this.render = function() {
-		// TODO
+		gl.clear(gl.COLOR_BUFFER_BIT);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
+		gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
+
+		gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
+		gl.vertexAttribPointer(this.locations.texCoord, 2, gl.FLOAT, false, 0, 0);
+
+		gl.drawArrays(gl.TRIANGLES, 0, this.positions.length / 2);
 	};
 };
 
@@ -407,13 +522,13 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	this.setRenderer = function(newrenderer) {
 		this.elem.innerHTML = "";
 		if (newrenderer === "auto" || newrenderer === "webgl") {
-			try {
+			//try {
 				this.renderer = new ut.WebGLRenderer(this);
-			} catch (e) {
-				console.log(e);
-				newrenderer = "canvas";
-				this.elem.innerHTML = "";
-			}
+			//} catch (e) {
+			//	console.log(e);
+			//	newrenderer = "canvas";
+			//	this.elem.innerHTML = "";
+			//}
 		}
 		if (newrenderer === "canvas") {
 			try {
