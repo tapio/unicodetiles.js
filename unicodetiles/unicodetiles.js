@@ -380,6 +380,26 @@ ut.WebGLRenderer = function(view) {
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 	};
 
+	/// Function: cacheChars
+	/// Introduce characters for WebGL renderer. This is also done automatically,
+	/// but as an optimization, you can do it yourself beforehand.
+	///
+	/// Parameters:
+	///   chars - (string) the characters to cache
+	///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
+	this.cacheChars = function(chars, build) {
+		if (!this.gl) return; // Nothing to do if not using WebGL renderer
+		var changed = false;
+		for (var i = 0; i < chars.length; ++i) {
+			if (!this.chars[chars[i]]) {
+				changed = true;
+				this.chars[chars[i]] = ++this.numCachedChars;
+			}
+		}
+
+		if (changed && build !== false) this.buildTexture();
+	};
+
 	this.updateStyle = function(s) {
 		s = s || window.getComputedStyle(this.view.elem, null);
 		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
@@ -464,32 +484,13 @@ ut.WebGLRenderer = function(view) {
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
+	this.cacheChars(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", false);
 	// We can't build the texture yet, since there is no tiles in the viewport
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
-
-	/// Function: cacheChars
-	/// Introduce characters for WebGL renderer. This is also done automatically,
-	/// but as an optimization, you can do it yourself beforehand.
-	///
-	/// Parameters:
-	///   chars - (string) the characters to cache
-	///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
-	this.cacheChars = function(chars, build) {
-		if (!this.gl) return; // Nothing to do if not using WebGL renderer
-		var changed = false;
-		for (var i = 0; i < chars.length; ++i) {
-			if (!this.chars[chars[i]]) {
-				changed = true;
-				this.chars[chars[i]] = ++this.numCachedChars;
-			}
-		}
-
-		if (changed && build === false) this.buildTexture();
-	};
 
 	this.clear = function() { /* No op */ };
 
