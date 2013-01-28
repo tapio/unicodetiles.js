@@ -309,7 +309,7 @@ ut.WebGLRenderer = function(view) {
 
 	this.attribs = {
 		position: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
-		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.DYNAMIC_DRAW },
+		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
 		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
 		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW }
 	};
@@ -337,7 +337,7 @@ ut.WebGLRenderer = function(view) {
 			for (var i = 0; i < w; ++i) {
 				var k = attribs.position.itemSize * 6 * (j * w + i);
 				insertQuad(attribs.position.data, k, i * this.tw, j * this.th, this.tw, this.th);
-				insertQuad(attribs.texCoord.data, k, 0, 0, 1, 1);
+				insertQuad(attribs.texCoord.data, k, i / w, j / h, 1 / w, 1 / h);
 				k = attribs.color.itemSize * 6 * (j * w + i);
 				for (var m = 0; m < attribs.color.itemSize * 6; ++m) {
 					attribs.color.data[k+m] = 1.0; // White default text
@@ -358,8 +358,26 @@ ut.WebGLRenderer = function(view) {
 	};
 
 	this.buildTexture = function() {
-		// TODO
-		this.ctx.fillText("@", this.offscreen.width/2, this.offscreen.height/2);
+		var tile, x, y;
+		var view = this.view, tiles = this.view.buffer;
+		var w = view.w, h = view.h;
+		var hth = (0.5*this.th)|0;
+		var hgap = (0.5*this.gap); // Squarification
+		this.ctx.fillStyle = "#000000";
+		this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
+		this.ctx.fillStyle = "#ffffff";
+		y = hth; // half because textBaseline is middle
+		for (var j = 0; j < h; ++j) {
+			x = 0;
+			for (var i = 0; i < w; ++i) {
+				tile = tiles[j][i];
+				// Do not attempt to render empty char
+				if (tile.ch.length) this.ctx.fillText(tile.ch, x+hgap, y);
+				x += this.tw + this.gap;
+			}
+			y += this.th;
+		}
+		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 	};
 
 	this.updateStyle = function(s) {
@@ -393,6 +411,8 @@ ut.WebGLRenderer = function(view) {
 	this.updateStyle();
 	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
 	this.canvas.height = this.th * view.h;
+	this.offscreen.width = this.canvas.width;
+	this.offscreen.height = this.canvas.height;
 	// Doing this again since setting canvas w/h resets the state
 	this.updateStyle();
 	this.chars = {};
@@ -442,12 +462,13 @@ ut.WebGLRenderer = function(view) {
 
 	// Setup texture
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
-	this.buildTexture();
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
+	// We can't build the texture yet, since there is no tiles in the viewport
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
 
 	/// Function: cacheChars
@@ -484,7 +505,7 @@ ut.WebGLRenderer = function(view) {
 			for (var i = 0; i < w; ++i) {
 				var tile = tiles[j][i];
 				var k = attribs.texCoord.itemSize * 6 * (j * w + i);
-				//insertQuad(attribs.texCoord.data, k, 0, 0, 1, 1);
+				// Color handling
 				k = attribs.color.itemSize * 6 * (j * w + i);
 				var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
 				var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
@@ -507,6 +528,8 @@ ut.WebGLRenderer = function(view) {
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
+
+		this.buildTexture();
 
 		var attrib = this.attribs.position;
 		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
