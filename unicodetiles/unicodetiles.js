@@ -20,11 +20,17 @@ ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 ut.VERTEX_SHADER = [
 	"attribute vec2 position;",
 	"attribute vec2 texCoord;",
+	"attribute vec3 color;",
+	"attribute vec3 bgColor;",
 	"uniform vec2 uResolution;",
 	"varying vec2 vTexCoord;",
+	"varying vec3 vColor;",
+	"varying vec3 vBgColor;",
 
 	"void main() {",
 		"vTexCoord = texCoord;",
+		"vColor = color;",
+		"vBgColor = bgColor;",
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
 		"gl_Position = vec4(pos.x, -pos.y, 0.0, 1.0);",
 	"}"
@@ -34,9 +40,12 @@ ut.FRAGMENT_SHADER = [
 	"precision mediump float;",
 	"uniform sampler2D uFont;",
 	"varying vec2 vTexCoord;",
+	"varying vec3 vColor;",
+	"varying vec3 vBgColor;",
 
 	"void main() {",
 		"vec4 color = texture2D(uFont, vTexCoord);",
+		"color.rgb = mix(vBgColor, vColor, color.rgb);",
 		"gl_FragColor = color;",
 	"}"
 ].join('\n');
@@ -296,10 +305,12 @@ ut.WebGLRenderer = function(view) {
 	var gl = this.gl;
 	view.elem.appendChild(this.canvas);
 
-	this.positions = null;
-	this.texCoords = null;
-	this.positionBuffer = null;
-	this.texCoordBuffer = null;
+	this.attribs = {
+		position: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
+		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
+		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.STATIC_DRAW },
+		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.STATIC_DRAW }
+	};
 
 	function insertQuad(arr, i, x, y, w, h) {
 		var x1 = x, y1 = y, x2 = x + w, y2 = y + h;
@@ -312,31 +323,36 @@ ut.WebGLRenderer = function(view) {
 	}
 
 	this.initBuffers = function() {
-		// Generate data
+		var a, attrib, attribs = this.attribs;
 		var w = this.view.w, h = this.view.h;
-		this.positions = new Float32Array(2 * 6 * w * h);
-		this.texCoords = new Float32Array(2 * 6 * w * h);
+		// Allocate data arrays
+		for (a in this.attribs) {
+			attrib = attribs[a];
+			attrib.data = new Float32Array(attrib.itemSize * 6 * w * h);
+		}
+		// Generate the data
 		for (var j = 0; j < h; ++j) {
 			for (var i = 0; i < w; ++i) {
-				var k = 12 * (j * w + i);
-				insertQuad(this.positions, k, i * this.tw, j * this.th, this.tw, this.th);
-				insertQuad(this.texCoords, k, 0, 0, 1, 1);
+				var k = attribs.position.itemSize * 6 * (j * w + i);
+				insertQuad(attribs.position.data, k, i * this.tw, j * this.th, this.tw, this.th);
+				insertQuad(attribs.texCoord.data, k, 0, 0, 1, 1);
+				k = attribs.color.itemSize * 6 * (j * w + i);
+				for (var m = 0; m < attribs.color.itemSize * 6; ++m) {
+					attribs.color.data[k+m] = 1.0; // White default text
+					attribs.bgColor.data[k+m] = 0.0; // Black default background
+				}
 			}
 		}
-		// Upload positions
-		if (this.positionBuffer) gl.deleteBuffer(this.positionBuffer);
-		this.positionBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.positionBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, this.positions, gl.STATIC_DRAW);
-		gl.enableVertexAttribArray(this.locations.position);
-		gl.vertexAttribPointer(this.locations.position, 2, gl.FLOAT, false, 0, 0);
-		// Upload texCoords
-		if (this.texCoordBuffer) gl.deleteBuffer(this.texCoordBuffer);
-		this.texCoordBuffer = gl.createBuffer();
-		gl.bindBuffer(gl.ARRAY_BUFFER, this.texCoordBuffer);
-		gl.bufferData(gl.ARRAY_BUFFER, this.texCoords, gl.STATIC_DRAW);
-		gl.enableVertexAttribArray(this.locations.texCoord);
-		gl.vertexAttribPointer(this.locations.texCoord, 2, gl.FLOAT, false, 0, 0);
+		// Upload
+		for (a in this.attribs) {
+			attrib = attribs[a];
+			if (attrib.buffer) gl.deleteBuffer(attrib.buffer);
+			attrib.buffer = gl.createBuffer();
+			gl.bindBuffer(gl.ARRAY_BUFFER, attrib.buffer);
+			gl.bufferData(gl.ARRAY_BUFFER, attrib.data, attrib.hint);
+			gl.enableVertexAttribArray(attrib.location);
+			gl.vertexAttribPointer(attrib.location, attrib.itemSize, gl.FLOAT, false, 0, 0);
+		}
 	};
 
 	this.buildTexture = function() {
@@ -403,20 +419,20 @@ ut.WebGLRenderer = function(view) {
 	}
 	gl.useProgram(program);
 
-	this.locations = {
-		position: gl.getAttribLocation(program, "position"),
-		texCoord: gl.getAttribLocation(program, "texCoord"),
-		resolution: gl.getUniformLocation(program, "uResolution"),
-		font: gl.getUniformLocation(program, "uFont")
-	};
+	// Get attribute locations
+	this.attribs.position.location = gl.getAttribLocation(program, "position");
+	this.attribs.texCoord.location = gl.getAttribLocation(program, "texCoord");
+	this.attribs.color.location    = gl.getAttribLocation(program, "color");
+	this.attribs.bgColor.location  = gl.getAttribLocation(program, "bgColor");
 
 	// Setup buffers and uniforms
 	this.initBuffers();
-	gl.uniform2f(this.locations.resolution, this.canvas.width, this.canvas.height);
+	var resolutionLocation = gl.getUniformLocation(program, "uResolution");
+	gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
 
 	// Setup texture
-	this.buildTexture();
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
+	this.buildTexture();
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
@@ -448,7 +464,8 @@ ut.WebGLRenderer = function(view) {
 
 	this.render = function() {
 		gl.clear(gl.COLOR_BUFFER_BIT);
-		gl.drawArrays(gl.TRIANGLES, 0, this.positions.length / 2);
+		var attrib = this.attribs.position;
+		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
 	};
 };
 
