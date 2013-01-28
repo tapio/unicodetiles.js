@@ -305,6 +305,8 @@ ut.WebGLRenderer = function(view) {
 	var gl = this.gl;
 	view.elem.appendChild(this.canvas);
 
+	this.charMap = {};
+	this.charArray = [];
 	this.defaultColors = { r: 1.0, g: 1.0, b: 1.0, br: 0.0, bg: 0.0, bb: 0.0 };
 
 	this.attribs = {
@@ -358,8 +360,7 @@ ut.WebGLRenderer = function(view) {
 	};
 
 	this.buildTexture = function() {
-		var tile, x, y;
-		var view = this.view, tiles = this.view.buffer;
+		var c = 0, ch, x, y;
 		var w = view.w, h = view.h;
 		var hth = (0.5*this.th)|0;
 		var hgap = (0.5*this.gap); // Squarification
@@ -369,12 +370,13 @@ ut.WebGLRenderer = function(view) {
 		y = hth; // half because textBaseline is middle
 		for (var j = 0; j < h; ++j) {
 			x = 0;
-			for (var i = 0; i < w; ++i) {
-				tile = tiles[j][i];
-				// Do not attempt to render empty char
-				if (tile.ch.length) this.ctx.fillText(tile.ch, x+hgap, y);
+			for (var i = 0; i < w; ++i, ++c) {
+				ch = this.charArray[c];
+				if (!ch) break;
+				this.ctx.fillText(ch, x + hgap, y);
 				x += this.tw + this.gap;
 			}
+			if (!ch) break;
 			y += this.th;
 		}
 		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
@@ -391,9 +393,10 @@ ut.WebGLRenderer = function(view) {
 		if (!this.gl) return; // Nothing to do if not using WebGL renderer
 		var changed = false;
 		for (var i = 0; i < chars.length; ++i) {
-			if (!this.chars[chars[i]]) {
+			if (!this.charMap[chars[i]]) {
 				changed = true;
-				this.chars[chars[i]] = ++this.numCachedChars;
+				this.charArray.push(chars[i]);
+				this.charMap[chars[i]] = this.charArray.length-1;
 			}
 		}
 
@@ -421,8 +424,6 @@ ut.WebGLRenderer = function(view) {
 	// Create an offscreen canvas for rendering text to texture
 	if (!this.offscreen)
 		this.offscreen = document.createElement("canvas");
-	this.offscreen.width = 32;
-	this.offscreen.height = 32;
 	this.offscreen.style.position = "absolute";
 	this.offscreen.style.top = "0px";
 	this.offscreen.style.left = "0px";
@@ -435,8 +436,6 @@ ut.WebGLRenderer = function(view) {
 	this.offscreen.height = this.canvas.height;
 	// Doing this again since setting canvas w/h resets the state
 	this.updateStyle();
-	this.chars = {};
-	this.numCachedChars = 0;
 
 	gl.viewport(0, 0, this.canvas.width, this.canvas.height);
 
@@ -484,8 +483,8 @@ ut.WebGLRenderer = function(view) {
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
-	this.cacheChars(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~", false);
-	// We can't build the texture yet, since there is no tiles in the viewport
+	this.cacheChars(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
+	this.cacheChars("☠☃⚙☻♞☭✈✟✂✯"); // FIXME: Remove
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -529,8 +528,6 @@ ut.WebGLRenderer = function(view) {
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
 		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
 		gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
-
-		this.buildTexture();
 
 		var attrib = this.attribs.position;
 		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
