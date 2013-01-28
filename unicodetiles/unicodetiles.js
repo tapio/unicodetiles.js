@@ -20,11 +20,12 @@ ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
 ut.VERTEX_SHADER = [
 	"attribute vec2 position;",
 	"attribute vec2 texCoord;",
+	"uniform vec2 uViewportSize;",
 	"varying vec2 vTexCoord;",
 
 	"void main() {",
 		"vTexCoord = texCoord;",
-		"gl_Position = position;",
+		"gl_Position = vec4(position / uViewportSize * 2.0 - 1.0, 0.0, 1.0);",
 	"}"
 ].join('\n');
 
@@ -229,58 +230,47 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 		if (changed && build === false) this.buildTexture();
 	};
 
-	/// Function: setRenderer
-	/// Switch renderer at runtime. All methods fallback to "dom" if unsuccesful.
-	/// Possible values:
-	///   * "webgl" - Use WebGL through an HTML5 <canvas> element
-	///   * "canvas" - Use HTML5 <canvas> element
-	///   * "dom" - Use regular HTML element manipulation through DOM
-	///   * "auto" - Use best available, i.e. try the above in order picking the first that works
-	this.setRenderer = function(newrenderer) {
-		// Reset stuff
-		this.elem.innerHTML = "";
-		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = this.gl = undefined;
-		// Canvas
-		if (newrenderer === "auto" || newrenderer === "canvas" || newrenderer === "webgl") {
-			// Create the visible canvas
-			this.canvas = document.createElement("canvas");
-			if (!!(this.canvas.getContext && this.canvas.getContext("experimental-webgl"))) {
-				this.elem.appendChild(this.canvas);
-				this.gl = this.canvas.getContext("experimental-webgl");
-				// Create an offscreen canvas rendering text to texture
-				this.offscreen = document.createElement("canvas");
-				this.offscreen.width = 2048;
-				this.offscreen.height = 2048;
-				this.ctx = this.offscreen.getContext("2d");
-				this.updateStyle();
-				this.canvas.width = (squarify ? this.th : this.tw) * w;
-				this.canvas.height = this.th * h;
-				// Doing this again since setting canvas w/h resets the state
-				this.updateStyle();
-				throw "WebGL renderer not yet implemented";
-				//return;
-			} else if (!!(this.canvas.getContext && this.canvas.getContext("2d") && this.canvas.getContext("2d").fillText)) {
-				this.elem.appendChild(this.canvas);
-				// Create an offscreen canvas for rendering
-				this.offscreen = document.createElement("canvas");
-				this.ctx = this.offscreen.getContext("2d");
-				this.ctx2 = this.canvas.getContext("2d");
-				this.updateStyle();
-				this.canvas.width = (squarify ? this.th : this.tw) * w;
-				this.canvas.height = this.th * h;
-				this.offscreen.width = this.canvas.width;
-				this.offscreen.height = this.canvas.height;
-				// Doing this again since setting canvas w/h resets the state
-				this.updateStyle();
-				return;
-			} else {
-				// Canvas failed
-				this.canvas = undefined;
-				newrenderer = "dom";
-			}
-		}
+	this.initWebGLRenderer = function() {
+		this.canvas = document.createElement("canvas");
+		// Try to fetch the context
+		if (!this.canvas.getContext) return false;
+		this.gl = this.canvas.getContext("experimental-webgl");
+		if (!this.gl) return false;
+		this.elem.appendChild(this.canvas);
+		// Create an offscreen canvas for rendering text to texture
+		if (!this.offscreen)
+			this.offscreen = document.createElement("canvas");
+		this.offscreen.width = 2048;
+		this.offscreen.height = 2048;
+		this.ctx = this.offscreen.getContext("2d");
+		this.updateStyle();
+		this.canvas.width = (squarify ? this.th : this.tw) * w;
+		this.canvas.height = this.th * h;
+		// Doing this again since setting canvas w/h resets the state
+		this.updateStyle();
+		return true;
+	};
 
-		// If we got here, all other methods have failed, or DOM was requested
+	this.initCanvasRenderer = function() {
+		this.canvas = document.createElement("canvas");
+		if (!this.canvas.getContext) return false;
+		this.ctx2 = this.canvas.getContext("2d");
+		if (!this.ctx2 || !this.ctx2.fillText) return false;
+		this.elem.appendChild(this.canvas);
+		// Create an offscreen canvas for rendering
+		this.offscreen = document.createElement("canvas");
+		this.ctx = this.offscreen.getContext("2d");
+		this.updateStyle();
+		this.canvas.width = (squarify ? this.th : this.tw) * w;
+		this.canvas.height = this.th * h;
+		this.offscreen.width = this.canvas.width;
+		this.offscreen.height = this.canvas.height;
+		// Doing this again since setting canvas w/h resets the state
+		this.updateStyle();
+		return true;
+	};
+
+	this.initDOMRenderer = function() {
 		// Create a matrix of <span> elements, cache references
 		this.spans = new Array(h);
 		this.colors = new Array(h);
@@ -296,6 +286,29 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 			this.elem.appendChild(this.spans[j][this.w]);
 		}
 		setTimeout(function() { ut.viewportStyleUpdaterHack.updateStyle(); }, 0);
+		return true;
+	};
+
+	/// Function: setRenderer
+	/// Switch renderer at runtime. All methods fallback to "dom" if unsuccesful.
+	/// Possible values:
+	///   * "webgl" - Use WebGL through an HTML5 <canvas> element
+	///   * "canvas" - Use HTML5 <canvas> element
+	///   * "dom" - Use regular HTML element manipulation through DOM
+	///   * "auto" - Use best available, i.e. try the above in order picking the first that works
+	this.setRenderer = function(newrenderer) {
+		// Reset stuff
+		this.elem.innerHTML = "";
+		this.spans = this.canvas = this.offscreen = this.ctx = this.ctx2 = this.gl = undefined;
+		// Try renderers
+		if (newrenderer === "auto" || newrenderer === "webgl") {
+			if (this.initWebGLRenderer()) return;
+			newrenderer = "canvas";
+		}
+		if (newrenderer === "canvas") {
+			if (this.initCanvasRenderer()) return;
+		}
+		this.initDOMRenderer();
 	};
 
 	this.setRenderer(renderer);
