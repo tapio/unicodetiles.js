@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Functional Test</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="../examples/style.css" rel="stylesheet" type="text/css" />
+</head>
+
+<body>
+<div id="container">
+
+	<p class="centerer">Displays all examples for quickly verifying they work.</p>
+	<a class="backlink" href="index.html">&lt;-- Back</a>
+
+</div>
+<script>
+	var path = "../examples/";
+	var names = [
+		"01-minimal",
+		"02-simple-dungeon",
+		"03-fov-dungeon",
+		"04-shader-lighting",
+		"05-infinite-forest",
+		"06-transition-effects",
+		"07-squarify"
+	];
+	var container = document.getElementById("container");
+
+	for (var i = 0; i < names.length; ++i) {
+		var frame = document.createElement("iframe");
+		frame.width = 800;
+		frame.height = 600;
+		frame.seamless = true;
+		frame.src = path + names[i] + ".html";
+		container.appendChild(frame);
+	}
+</script> 
+</body>
+</html>
