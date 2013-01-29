@@ -10,9 +10,11 @@
 var ut = ut || {};
 
 /// Constants: Semi-internal constants for ut namespace
+/// VERSION  - Version of the library as string
 /// NULLCHAR - Character used when none is specified otherwise.
 /// CSSCLASS - The CSS class name used for the tile engine element.
 /// NULLTILE - The tile used as placeholder for empty tile.
+ut.VERSION = "2.0dev";
 ut.NULLCHAR = " ";
 ut.CSSCLASS = "unicodetiles";
 ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
