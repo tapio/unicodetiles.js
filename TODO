@@ -13,8 +13,6 @@ WebGLRenderer:
 	* Fix horizontal gaps
 	* Test Opera
 	* Test falling back
-DOMRenderer:
-	* Default colors to match others
 Examples:
 	* More GC friendliness
 	* Something that demoes WebGL
@@ -23,4 +21,6 @@ Tests:
 	* More GC friendliness
 	* functional-01-all-examples
 	* functional-02-lots-of-unicode
+	* functional-03-inheriting-css-colors
 	* performance-04-huge-viewport
+

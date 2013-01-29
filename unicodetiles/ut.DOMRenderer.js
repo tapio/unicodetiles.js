@@ -50,13 +50,15 @@ ut.DOMRenderer.prototype.clear = function() {
 ut.DOMRenderer.prototype.render = function() {
 	var w = this.view.w, h = this.view.h;
 	var buffer = this.view.buffer;
+	var defaultColor = this.view.defaultColor;
+	var defaultBackground = this.view.defaultBackground;
 	for (var j = 0; j < h; ++j) {
 		for (var i = 0; i < w; ++i) {
 			var tile = buffer[j][i];
 			var span = this.spans[j][i];
 			// Check and update colors
-			var fg = tile.getColorRGB();
-			var bg = tile.getBackgroundRGB();
+			var fg = tile.r === undefined ? defaultColor : tile.getColorRGB();
+			var bg = tile.br === undefined ? defaultBackground : tile.getBackgroundRGB();
 			var colorHash = fg + bg;
 			if (colorHash !== this.colors[j][i]) {
 				this.colors[j][i] = colorHash;
