@@ -6,6 +6,9 @@
 	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
 	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
 	<link href="../examples/style.css" rel="stylesheet" type="text/css" />
+	<style>
+		#game { font-size: 17px; }
+	</style>
 	<script src="../unicodetiles/unicodetiles.js"></script>
 	<script src="../unicodetiles/ut.WebGLRenderer.js"></script>
 	<script src="../unicodetiles/ut.CanvasRenderer.js"></script>
@@ -15,14 +18,17 @@
 		var term; // Can't be initialized yet because DOM is not ready
 
 		function start() {
-			var w = 50, h = 26;
-			term = new ut.Viewport(document.getElementById("game"), w, h);
+			var w = 25, h = 25;
+			term = new ut.Viewport(document.getElementById("game"), w, h, "auto", true);
 			term.clear();
 			for (var j = 0; j < h; ++j) {
 				for (var i = 0; i < w; ++i) {
-					var c = 161 + j * w + i;
+					var c = 33 + (j * w + i) % 94;
 					var ch = String.fromCharCode(c);
+					if (Math.random() > 0.2) ch = "▒";
 					var tile = new ut.Tile(ch, (Math.random()*255)|0, (Math.random()*255)|0, (Math.random()*255)|0);
+					if (Math.random() > 0.2)
+						tile.setBackground((Math.random()*255)|0, (Math.random()*255)|0, (Math.random()*255)|0);
 					term.put(tile, i, j);
 				}
 			}
@@ -33,9 +39,6 @@
 </head>
 
 <body onload="start(); createRendererSwitcher();"><div id="container">
-
-	<p class="centerer">You should see lots of different Unicode letters below.
-	Last rows should also display mostly proper symbols.</p>
 
 	<div class="centerer">
 		<div id="game">Enable JavaScript and reload the page.</div>
