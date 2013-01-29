@@ -17,6 +17,7 @@ function createRendererSwitcher(doSwitch) {
 	// Do we switch?
 	if (doSwitch) {
 		term.setRenderer(nextR);
+		term.render();
 		createRendererSwitcher(); // Call again to update, but this time no switching
 		return;
 	}

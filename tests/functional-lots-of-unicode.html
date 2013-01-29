@@ -10,6 +10,7 @@
 	<script src="../unicodetiles/ut.WebGLRenderer.js"></script>
 	<script src="../unicodetiles/ut.CanvasRenderer.js"></script>
 	<script src="../unicodetiles/ut.DOMRenderer.js"></script>
+	<script src="../examples/renderer-switcher.js"></script>
 	<script>
 		var term; // Can't be initialized yet because DOM is not ready
 
@@ -28,16 +29,20 @@
 			term.render();
 		}
 
-	</script> 
+	</script>
 </head>
 
-<body onload="start();"><div id="container">
+<body onload="start(); createRendererSwitcher();"><div id="container">
 
 	<p class="centerer">You should see lots of different Unicode letters below.
 	Last rows should also display mostly proper symbols.</p>
 
 	<div class="centerer">
 		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
 	</div>
 
 	<a class="backlink" href="index.html">&lt;-- Back to index</a>
