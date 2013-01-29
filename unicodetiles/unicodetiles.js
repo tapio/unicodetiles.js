@@ -10,7 +10,7 @@
 var ut = ut || {};
 
 /// Constants: Semi-internal constants for ut namespace
-/// VERSION  - Version of the library as string
+/// VERSION  - Version of the library as string.
 /// NULLCHAR - Character used when none is specified otherwise.
 /// CSSCLASS - The CSS class name used for the tile engine element.
 /// NULLTILE - The tile used as placeholder for empty tile.
@@ -117,7 +117,7 @@ ut.NULLTILE = new ut.Tile();
 
 
 /// Class: Viewport
-/// The tile engine viewport / renderer / window.
+/// The tile engine viewport / window. Takes care of initializing a proper renderer.
 
 /// Constructor: Viewport
 /// Constructs a new Viewport object.
@@ -164,10 +164,10 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	/// Function: setRenderer
 	/// Switch renderer at runtime. All methods fallback to "dom" if unsuccesful.
 	/// Possible values:
-	///   * "webgl" - Use WebGL through an HTML5 <canvas> element
+	///   * "webgl" - Use WebGL with an HTML5 <canvas> element
 	///   * "canvas" - Use HTML5 <canvas> element
 	///   * "dom" - Use regular HTML element manipulation through DOM
-	///   * "auto" - Use best available, i.e. try the above in order picking the first that works
+	///   * "auto" - Use best available, i.e. try the above in order, picking the first that works
 	this.setRenderer = function(newrenderer) {
 		this.elem.innerHTML = "";
 		if (newrenderer === "auto" || newrenderer === "webgl") {

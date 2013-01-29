@@ -2,6 +2,8 @@
 
 /// Class: DOMRenderer
 /// Renders the <Viewport> into DOM elements.
+///
+/// *Note:* This is an internal class used by <Viewport>
 ut.DOMRenderer = function(view) {
 	"use strict";
 	this.view = view;

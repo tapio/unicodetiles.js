@@ -2,7 +2,9 @@
 
 /// Class: WebGLRenderer
 /// Renders the <Viewport> with WebGL.
-/// Given decent GPU drivers and browser support, this is the best renderer.
+/// Given decent GPU drivers and browser support, this is the fastest renderer.
+///
+/// *Note:* This is an internal class used by <Viewport>
 ut.WebGLRenderer = function(view) {
 	"use strict";
 	this.view = view;
@@ -170,13 +172,6 @@ ut.WebGLRenderer.prototype.buildTexture = function() {
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 };
 
-/// Function: cacheChars
-/// Introduce characters for WebGL renderer. This is also done automatically,
-/// but as an optimization, you can do it yourself beforehand.
-///
-/// Parameters:
-///   chars - (string) the characters to cache
-///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
 ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
 	if (!this.gl) return; // Nothing to do if not using WebGL renderer
 	var changed = false;

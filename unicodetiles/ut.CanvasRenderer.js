@@ -2,6 +2,8 @@
 
 /// Class: CanvasRenderer
 /// Renders the <Viewport> into an HTML5 <canvas> element.
+///
+/// *Note:* This is an internal class used by <Viewport>
 ut.CanvasRenderer = function(view) {
 	"use strict";
 	this.view = view;
