@@ -131,7 +131,6 @@ ut.WebGLRenderer = function(view) {
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	this.cacheChars(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-	this.cacheChars("☠☃⚙☻♞☭✈✟✂✯"); // FIXME: Remove
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
@@ -213,10 +212,16 @@ ut.WebGLRenderer.prototype.render = function() {
 	var tiles = this.view.buffer;
 	var defaultColor = this.view.defaultColor;
 	var defaultBgColor = this.view.defaultBackground;
+	var newChars = false;
 	for (var j = 0; j < h; ++j) {
 		for (var i = 0; i < w; ++i) {
 			var tile = tiles[j][i];
-			var ch = this.charMap[tile.ch] || 0;
+			var ch = this.charMap[tile.ch];
+			if (ch === undefined) { // Auto-cache new characters
+				this.cacheChars(tile.ch, false);
+				newChars = true;
+				ch = this.charMap[tile.ch];
+			}
 			var k = attribs.color.itemSize * 6 * (j * w + i);
 			var kk = attribs.char.itemSize * 6 * (j * w + i);
 			var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
@@ -238,6 +243,7 @@ ut.WebGLRenderer.prototype.render = function() {
 		}
 	}
 	// Upload
+	if (newChars) this.buildTexture();
 	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.color.buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
 	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
