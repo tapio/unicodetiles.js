@@ -37,38 +37,39 @@ ut.DOMRenderer = function(view) {
 			}
 		}
 	};
+};
 
-	this.clear = function() {
-		for (var j = 0; j < this.h; ++j) {
-			for (var i = 0; i < this.w; ++i) {
-				this.colors[j][i] = "";
-			}
-		}
-	};
 
-	this.render = function() {
-		var w = this.view.w, h = this.view.h;
-		var buffer = this.view.buffer;
-		for (var j = 0; j < h; ++j) {
-			for (var i = 0; i < w; ++i) {
-				var tile = buffer[j][i];
-				var span = this.spans[j][i];
-				// Check and update colors
-				var fg = tile.getColorRGB();
-				var bg = tile.getBackgroundRGB();
-				var colorHash = fg + bg;
-				if (colorHash !== this.colors[j][i]) {
-					this.colors[j][i] = colorHash;
-					span.style.color = fg;
-					span.style.backgroundColor = bg;
-				}
-				// Check and update character
-				var ch = tile.getChar();
-				if (ch !== span.innerHTML)
-					span.innerHTML = ch;
-			}
+ut.DOMRenderer.prototype.clear = function() {
+	for (var j = 0; j < this.h; ++j) {
+		for (var i = 0; i < this.w; ++i) {
+			this.colors[j][i] = "";
 		}
-	};
+	}
+};
+
+ut.DOMRenderer.prototype.render = function() {
+	var w = this.view.w, h = this.view.h;
+	var buffer = this.view.buffer;
+	for (var j = 0; j < h; ++j) {
+		for (var i = 0; i < w; ++i) {
+			var tile = buffer[j][i];
+			var span = this.spans[j][i];
+			// Check and update colors
+			var fg = tile.getColorRGB();
+			var bg = tile.getBackgroundRGB();
+			var colorHash = fg + bg;
+			if (colorHash !== this.colors[j][i]) {
+				this.colors[j][i] = colorHash;
+				span.style.color = fg;
+				span.style.backgroundColor = bg;
+			}
+			// Check and update character
+			var ch = tile.getChar();
+			if (ch !== span.innerHTML)
+				span.innerHTML = ch;
+		}
+	}
 };
 
 ut.viewportStyleUpdaterHack = null;

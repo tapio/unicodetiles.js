@@ -158,8 +158,8 @@ ut.WebGLRenderer = function(view) {
 		}
 		return shader;
 	}
-	var vertexShader = compileShader(gl.VERTEX_SHADER, ut.VERTEX_SHADER);
-	var fragmentShader = compileShader(gl.FRAGMENT_SHADER, ut.FRAGMENT_SHADER);
+	var vertexShader = compileShader(gl.VERTEX_SHADER, ut.WebGLRenderer.VERTEX_SHADER);
+	var fragmentShader = compileShader(gl.FRAGMENT_SHADER, ut.WebGLRenderer.FRAGMENT_SHADER);
 	var program = gl.createProgram();
 	gl.attachShader(program, vertexShader);
 	gl.attachShader(program, fragmentShader);
@@ -199,55 +199,57 @@ ut.WebGLRenderer = function(view) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
-
-	this.clear = function() { /* No op */ };
-
-	this.render = function() {
-		gl.clear(gl.COLOR_BUFFER_BIT);
-		var attribs = this.attribs;
-		var w = this.view.w, h = this.view.h;
-		// Create new tile data
-		var tiles = this.view.buffer;
-		var defaultColor = this.view.defaultColor;
-		var defaultBgColor = this.view.defaultBackground;
-		for (var j = 0; j < h; ++j) {
-			for (var i = 0; i < w; ++i) {
-				var tile = tiles[j][i];
-				var ch = this.charMap[tile.ch] || 0;
-				var k = attribs.color.itemSize * 6 * (j * w + i);
-				var kk = attribs.char.itemSize * 6 * (j * w + i);
-				var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
-				var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
-				var b = tile.b === undefined ? this.defaultColors.b : tile.b / 255;
-				var br = tile.br === undefined ? this.defaultColors.br : tile.br / 255;
-				var bg = tile.bg === undefined ? this.defaultColors.bg : tile.bg / 255;
-				var bb = tile.bb === undefined ? this.defaultColors.bb : tile.bb / 255;
-				for (var m = 0; m < 6; ++m) {
-					var n = k + m * attribs.color.itemSize;
-					attribs.color.data[n+0] = r;
-					attribs.color.data[n+1] = g;
-					attribs.color.data[n+2] = b;
-					attribs.bgColor.data[n+0] = br;
-					attribs.bgColor.data[n+1] = bg;
-					attribs.bgColor.data[n+2] = bb;
-					attribs.char.data[kk+m] = ch;
-				}
-			}
-		}
-		// Upload
-		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.color.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
-		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
-		gl.bindBuffer(gl.ARRAY_BUFFER, attribs.char.buffer);
-		gl.bufferData(gl.ARRAY_BUFFER, attribs.char.data, attribs.char.hint);
-
-		var attrib = this.attribs.position;
-		gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
-	};
 };
 
-ut.VERTEX_SHADER = [
+ut.WebGLRenderer.prototype.clear = function() { /* No op */ };
+
+ut.WebGLRenderer.prototype.render = function() {
+	var gl = this.gl;
+	gl.clear(gl.COLOR_BUFFER_BIT);
+	var attribs = this.attribs;
+	var w = this.view.w, h = this.view.h;
+	// Create new tile data
+	var tiles = this.view.buffer;
+	var defaultColor = this.view.defaultColor;
+	var defaultBgColor = this.view.defaultBackground;
+	for (var j = 0; j < h; ++j) {
+		for (var i = 0; i < w; ++i) {
+			var tile = tiles[j][i];
+			var ch = this.charMap[tile.ch] || 0;
+			var k = attribs.color.itemSize * 6 * (j * w + i);
+			var kk = attribs.char.itemSize * 6 * (j * w + i);
+			var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
+			var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
+			var b = tile.b === undefined ? this.defaultColors.b : tile.b / 255;
+			var br = tile.br === undefined ? this.defaultColors.br : tile.br / 255;
+			var bg = tile.bg === undefined ? this.defaultColors.bg : tile.bg / 255;
+			var bb = tile.bb === undefined ? this.defaultColors.bb : tile.bb / 255;
+			for (var m = 0; m < 6; ++m) {
+				var n = k + m * attribs.color.itemSize;
+				attribs.color.data[n+0] = r;
+				attribs.color.data[n+1] = g;
+				attribs.color.data[n+2] = b;
+				attribs.bgColor.data[n+0] = br;
+				attribs.bgColor.data[n+1] = bg;
+				attribs.bgColor.data[n+2] = bb;
+				attribs.char.data[kk+m] = ch;
+			}
+		}
+	}
+	// Upload
+	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.color.buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
+	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
+	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.char.buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, attribs.char.data, attribs.char.hint);
+
+	var attrib = this.attribs.position;
+	gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
+};
+
+
+ut.WebGLRenderer.VERTEX_SHADER = [
 	"attribute vec2 position;",
 	"attribute vec2 texCoord;",
 	"attribute vec3 color;",
@@ -269,7 +271,7 @@ ut.VERTEX_SHADER = [
 	"}"
 ].join('\n');
 
-ut.FRAGMENT_SHADER = [
+ut.WebGLRenderer.FRAGMENT_SHADER = [
 	"precision mediump float;",
 	"uniform sampler2D uFont;",
 	"varying vec2 vTexCoord;",

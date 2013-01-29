@@ -31,41 +31,42 @@ ut.CanvasRenderer = function(view) {
 	this.offscreen.height = this.canvas.height;
 	// Doing this again since setting canvas w/h resets the state
 	this.updateStyle();
+};
 
-	this.clear = function() { /* No op */ };
 
-	this.render = function() {
-		var tile, ch, fg, bg, x, y;
-		var view = this.view, buffer = this.view.buffer;
-		var w = view.w, h = view.h;
-		var hth = (0.5*this.th)|0;
-		var hgap = (0.5*this.gap); // Squarification
-		// Clearing with one big rect is much faster than with individual char rects
-		this.ctx.fillStyle = view.defaultBackground;
-		this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
-		y = hth; // half because textBaseline is middle
-		for (var j = 0; j < h; ++j) {
-			x = 0;
-			for (var i = 0; i < w; ++i) {
-				tile = buffer[j][i];
-				ch = tile.ch;
-				fg = tile.getColorRGB();
-				bg = tile.getBackgroundRGB();
-				// Only render background if the color is non-default
-				if (bg.length && bg !== view.defaultBackground) {
-					this.ctx.fillStyle = bg;
-					this.ctx.fillRect(x, y-hth, this.tw, this.th);
-				}
-				// Do not attempt to render empty char
-				if (ch.length) {
-					if (!fg.length) fg = view.defaultColor;
-					this.ctx.fillStyle = fg;
-					this.ctx.fillText(ch, x+hgap, y);
-				}
-				x += this.tw;
+ut.CanvasRenderer.prototype.clear = function() { /* No op */ };
+
+ut.CanvasRenderer.prototype.render = function() {
+	var tile, ch, fg, bg, x, y;
+	var view = this.view, buffer = this.view.buffer;
+	var w = view.w, h = view.h;
+	var hth = (0.5*this.th)|0;
+	var hgap = (0.5*this.gap); // Squarification
+	// Clearing with one big rect is much faster than with individual char rects
+	this.ctx.fillStyle = view.defaultBackground;
+	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
+	y = hth; // half because textBaseline is middle
+	for (var j = 0; j < h; ++j) {
+		x = 0;
+		for (var i = 0; i < w; ++i) {
+			tile = buffer[j][i];
+			ch = tile.ch;
+			fg = tile.getColorRGB();
+			bg = tile.getBackgroundRGB();
+			// Only render background if the color is non-default
+			if (bg.length && bg !== view.defaultBackground) {
+				this.ctx.fillStyle = bg;
+				this.ctx.fillRect(x, y-hth, this.tw, this.th);
 			}
-			y += this.th;
+			// Do not attempt to render empty char
+			if (ch.length) {
+				if (!fg.length) fg = view.defaultColor;
+				this.ctx.fillStyle = fg;
+				this.ctx.fillText(ch, x+hgap, y);
+			}
+			x += this.tw;
 		}
-		this.ctx2.drawImage(this.offscreen, 0, 0);
-	};
+		y += this.th;
+	}
+	this.ctx2.drawImage(this.offscreen, 0, 0);
 };
