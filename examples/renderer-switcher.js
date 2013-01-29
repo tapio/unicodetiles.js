@@ -5,14 +5,14 @@ function createRendererSwitcher(doSwitch) {
 	var curR = term.getRendererString();
 	var nextR, pretty;
 	if (curR === "webgl") {
-		nextR = "dom";
-		pretty = "DOM";
-	} else if (curR === "canvas") {
-		nextR = "webgl";
-		pretty = "WebGL";
-	} else {
 		nextR = "canvas";
 		pretty = "&lt;canvas&gt;";
+	} else if (curR === "canvas") {
+		nextR = "dom";
+		pretty = "DOM";
+	} else {
+		nextR = "webgl";
+		pretty = "WebGL";
 	}
 	// Do we switch?
 	if (doSwitch) {

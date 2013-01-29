@@ -54,14 +54,14 @@ function init(w, h) {
 	var a = document.getElementById("switch-renderer");
 	a.onclick = again;
 	if (term.getRendererString() === "dom") {
-		a.innerHTML = "Switch to &lt;canvas&gt; renderer";
-		a.href = "#canvas";
-	} else if (term.getRendererString() === "canvas") {
 		a.innerHTML = "Switch to WebGL renderer";
 		a.href = "#webgl";
-	} else if (term.getRendererString() === "webgl") {
+	} else if (term.getRendererString() === "canvas") {
 		a.innerHTML = "Switch to DOM renderer";
 		a.href = "#dom";
+	} else if (term.getRendererString() === "webgl") {
+		a.innerHTML = "Switch to &lt;canvas&gt; renderer";
+		a.href = "#canvas";
 	}
 }
 
