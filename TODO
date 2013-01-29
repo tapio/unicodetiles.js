@@ -1,15 +1,26 @@
 General:
-	* Make separate files for renderers, possibly others too
+	* Split Engine to separate file?
 Engine:
 	* Investigate if shader callback should be removed
 	* Investigate if tile cache usage could be simplified to use only one code path
 Input:
 	* Key repeat broken on Opera (does not honor the delay)
 Viewport:
+	* Check for presence of renderers before attempting to create one
 	* setDefaultColor, setDefaultBackground
 		-> CSS from the parent as is now?
 WebGLRenderer:
-	* Auto character caching
+	* Fix horizontal gaps
 	* Test Opera
 	* Test falling back
-
+DOMRenderer:
+	* Default colors to match others
+Examples:
+	* More GC friendliness
+	* Something that demoes WebGL
+	* DOMRenderer tile CSS styling (border-radius, drop-shadow etc...)
+Tests:
+	* More GC friendliness
+	* functional-01-all-examples
+	* functional-02-lots-of-unicode
+	* performance-04-huge-viewport
