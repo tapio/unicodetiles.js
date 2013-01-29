@@ -29,19 +29,18 @@ ut.DOMRenderer.prototype.updateStyle = function(s) {
 	this.tw = parseInt(s.width, 10);
 	if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
 	this.th = parseInt(s.height, 10);
-	this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+	if (this.view.squarify) this.tw = this.th;
 	var w = this.view.w, h = this.view.h;
 	for (var j = 0; j < h; ++j) {
 		for (var i = 0; i < w; ++i) {
-			this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
-			this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
+			this.spans[j][i].style.width = this.tw + "px";
 		}
 	}
 };
 
 ut.DOMRenderer.prototype.clear = function() {
-	for (var j = 0; j < this.h; ++j) {
-		for (var i = 0; i < this.w; ++i) {
+	for (var j = 0; j < this.view.h; ++j) {
+		for (var i = 0; i < this.view.w; ++i) {
 			this.colors[j][i] = "";
 		}
 	}
