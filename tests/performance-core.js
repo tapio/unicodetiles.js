@@ -39,13 +39,15 @@ function again() {
 }
 
 // Called after HTML is loaded, initializes UnicodeTiles etc.
-function init() {
+function init(w, h) {
+	w = w || 51;
+	h = h || 25;
 	var renderer = "auto";
 	if (location.hash.indexOf("#dom") != -1) renderer = "dom";
 	else if (location.hash.indexOf("#canvas") != -1) renderer = "canvas";
 	else if (location.hash.indexOf("#webgl") != -1) renderer = "webgl";
 
-	term = new ut.Viewport(document.getElementById("game"), 51, 25, renderer);
+	term = new ut.Viewport(document.getElementById("game"), w, h, renderer);
 	eng = new ut.Engine(term, randomTile);
 
 	document.getElementById("renderer").innerHTML = term.getRendererString();
