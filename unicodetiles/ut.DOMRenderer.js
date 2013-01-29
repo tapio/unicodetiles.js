@@ -22,23 +22,22 @@ ut.DOMRenderer = function(view) {
 	}
 	ut.viewportStyleUpdaterHack = this;
 	setTimeout(function() { ut.viewportStyleUpdaterHack.updateStyle(); }, 0);
-
-	this.updateStyle = function(s) {
-		s = window.getComputedStyle(this.spans[0][0], null);
-		this.tw = parseInt(s.width, 10);
-		if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
-		this.th = parseInt(s.height, 10);
-		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
-		var w = this.view.w, h = this.view.h;
-		for (j = 0; j < h; ++j) {
-			for (i = 0; i < w; ++i) {
-				this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
-				this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
-			}
-		}
-	};
 };
 
+ut.DOMRenderer.prototype.updateStyle = function(s) {
+	s = window.getComputedStyle(this.spans[0][0], null);
+	this.tw = parseInt(s.width, 10);
+	if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
+	this.th = parseInt(s.height, 10);
+	this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+	var w = this.view.w, h = this.view.h;
+	for (var j = 0; j < h; ++j) {
+		for (var i = 0; i < w; ++i) {
+			this.spans[j][i].style.paddingLeft = ((this.gap/2)|0) + "px";
+			this.spans[j][i].style.paddingRight = ((this.gap/2)|0) + "px";
+		}
+	}
+};
 
 ut.DOMRenderer.prototype.clear = function() {
 	for (var j = 0; j < this.h; ++j) {

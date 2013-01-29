@@ -65,68 +65,6 @@ ut.WebGLRenderer = function(view) {
 		}
 	};
 
-	this.buildTexture = function() {
-		var c = 0, ch;
-		var w = view.w, h = view.h;
-		var hgap = (0.5*this.gap); // Squarification
-		this.ctx.fillStyle = "#000000";
-		this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
-		this.ctx.fillStyle = "#ffffff";
-		var y = (0.5*this.th)|0; // Half because textBaseline is middle
-		for (var j = 0; j < h; ++j) {
-			var x = 0;
-			for (var i = 0; i < w; ++i, ++c) {
-				ch = this.charArray[c];
-				if (!ch) break;
-				this.ctx.fillText(ch, x + hgap, y);
-				x += this.tw;
-			}
-			if (!ch) break;
-			y += this.th;
-		}
-		gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
-	};
-
-	/// Function: cacheChars
-	/// Introduce characters for WebGL renderer. This is also done automatically,
-	/// but as an optimization, you can do it yourself beforehand.
-	///
-	/// Parameters:
-	///   chars - (string) the characters to cache
-	///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
-	this.cacheChars = function(chars, build) {
-		if (!this.gl) return; // Nothing to do if not using WebGL renderer
-		var changed = false;
-		for (var i = 0; i < chars.length; ++i) {
-			if (!this.charMap[chars[i]]) {
-				changed = true;
-				this.charArray.push(chars[i]);
-				this.charMap[chars[i]] = this.charArray.length-1;
-			}
-		}
-
-		if (changed && build !== false) this.buildTexture();
-	};
-
-	this.updateStyle = function(s) {
-		s = s || window.getComputedStyle(this.view.elem, null);
-		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
-		this.ctx.textBaseline = "middle";
-		this.ctx.fillStyle = "#ffffff";
-		this.tw = this.ctx.measureText("M").width;
-		this.th = parseInt(s.fontSize, 10);
-		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
-		if (this.view.squarify) this.tw = this.th;
-		var color = s.color.match(/\d+/g);
-		var bgColor = s.backgroundColor.match(/\d+/g);
-		this.defaultColors.r = parseInt(color[0], 10) / 255;
-		this.defaultColors.g = parseInt(color[1], 10) / 255;
-		this.defaultColors.b = parseInt(color[2], 10) / 255;
-		this.defaultColors.br = parseInt(bgColor[0], 10) / 255;
-		this.defaultColors.bg = parseInt(bgColor[1], 10) / 255;
-		this.defaultColors.bb = parseInt(bgColor[2], 10) / 255;
-	};
-
 	// Create an offscreen canvas for rendering text to texture
 	if (!this.offscreen)
 		this.offscreen = document.createElement("canvas");
@@ -199,6 +137,69 @@ ut.WebGLRenderer = function(view) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
+};
+
+ut.WebGLRenderer.prototype.buildTexture = function() {
+	var c = 0, ch;
+	var w = this.view.w, h = this.view.h;
+	var hgap = (0.5*this.gap); // Squarification
+	this.ctx.fillStyle = "#000000";
+	this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
+	this.ctx.fillStyle = "#ffffff";
+	var y = (0.5*this.th)|0; // Half because textBaseline is middle
+	for (var j = 0; j < h; ++j) {
+		var x = 0;
+		for (var i = 0; i < w; ++i, ++c) {
+			ch = this.charArray[c];
+			if (!ch) break;
+			this.ctx.fillText(ch, x + hgap, y);
+			x += this.tw;
+		}
+		if (!ch) break;
+		y += this.th;
+	}
+	var gl = this.gl;
+	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
+};
+
+/// Function: cacheChars
+/// Introduce characters for WebGL renderer. This is also done automatically,
+/// but as an optimization, you can do it yourself beforehand.
+///
+/// Parameters:
+///   chars - (string) the characters to cache
+///   build - (boolean) (optional) - set to false if you don't want to automatically call buildTexture()
+ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
+	if (!this.gl) return; // Nothing to do if not using WebGL renderer
+	var changed = false;
+	for (var i = 0; i < chars.length; ++i) {
+		if (!this.charMap[chars[i]]) {
+			changed = true;
+			this.charArray.push(chars[i]);
+			this.charMap[chars[i]] = this.charArray.length-1;
+		}
+	}
+
+	if (changed && build !== false) this.buildTexture();
+};
+
+ut.WebGLRenderer.prototype.updateStyle = function(s) {
+	s = s || window.getComputedStyle(this.view.elem, null);
+	this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
+	this.ctx.textBaseline = "middle";
+	this.ctx.fillStyle = "#ffffff";
+	this.tw = this.ctx.measureText("M").width;
+	this.th = parseInt(s.fontSize, 10);
+	this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+	if (this.view.squarify) this.tw = this.th;
+	var color = s.color.match(/\d+/g);
+	var bgColor = s.backgroundColor.match(/\d+/g);
+	this.defaultColors.r = parseInt(color[0], 10) / 255;
+	this.defaultColors.g = parseInt(color[1], 10) / 255;
+	this.defaultColors.b = parseInt(color[2], 10) / 255;
+	this.defaultColors.br = parseInt(bgColor[0], 10) / 255;
+	this.defaultColors.bg = parseInt(bgColor[1], 10) / 255;
+	this.defaultColors.bb = parseInt(bgColor[2], 10) / 255;
 };
 
 ut.WebGLRenderer.prototype.clear = function() { /* No op */ };

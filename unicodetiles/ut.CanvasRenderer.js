@@ -11,16 +11,6 @@ ut.CanvasRenderer = function(view) {
 	if (!this.ctx2 || !this.ctx2.fillText) throw("Canvas not supported");
 	view.elem.appendChild(this.canvas);
 
-	this.updateStyle = function(s) {
-		s = s || window.getComputedStyle(this.view.elem, null);
-		this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
-		this.ctx.textBaseline = "middle";
-		this.tw = this.ctx.measureText("M").width;
-		this.th = parseInt(s.fontSize, 10);
-		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
-		if (this.view.squarify) this.tw = this.th;
-	};
-
 	// Create an offscreen canvas for rendering
 	this.offscreen = document.createElement("canvas");
 	this.ctx = this.offscreen.getContext("2d");
@@ -33,6 +23,15 @@ ut.CanvasRenderer = function(view) {
 	this.updateStyle();
 };
 
+ut.CanvasRenderer.prototype.updateStyle = function(s) {
+	s = s || window.getComputedStyle(this.view.elem, null);
+	this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
+	this.ctx.textBaseline = "middle";
+	this.tw = this.ctx.measureText("M").width;
+	this.th = parseInt(s.fontSize, 10);
+	this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+	if (this.view.squarify) this.tw = this.th;
+};
 
 ut.CanvasRenderer.prototype.clear = function() { /* No op */ };
 
