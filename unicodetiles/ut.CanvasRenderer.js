@@ -18,6 +18,7 @@ ut.CanvasRenderer = function(view) {
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
 		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+		if (this.view.squarify) this.tw = this.th;
 	};
 
 	// Create an offscreen canvas for rendering
@@ -53,7 +54,7 @@ ut.CanvasRenderer = function(view) {
 				// Only render background if the color is non-default
 				if (bg.length && bg !== view.defaultBackground) {
 					this.ctx.fillStyle = bg;
-					this.ctx.fillRect(x, y-hth, this.tw+this.gap, this.th);
+					this.ctx.fillRect(x, y-hth, this.tw, this.th);
 				}
 				// Do not attempt to render empty char
 				if (ch.length) {
@@ -61,7 +62,7 @@ ut.CanvasRenderer = function(view) {
 					this.ctx.fillStyle = fg;
 					this.ctx.fillText(ch, x+hgap, y);
 				}
-				x += this.tw + this.gap;
+				x += this.tw;
 			}
 			y += this.th;
 		}
