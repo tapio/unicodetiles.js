@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Performance Test</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="../examples/style.css" rel="stylesheet" type="text/css" />
+	<script type="text/javascript" src="../unicodetiles/unicodetiles.js"></script>
+	<script type="text/javascript" src="../unicodetiles/ut.WebGLRenderer.js"></script>
+	<script type="text/javascript" src="../unicodetiles/ut.CanvasRenderer.js"></script>
+	<script type="text/javascript" src="../unicodetiles/ut.DOMRenderer.js"></script>
+	<script type="text/javascript" src="performance-core.js"></script>
+	<script type="text/javascript">
+		randomTile = function(x, y) {
+			var r = Math.floor(Math.random() * 255);
+			var g = Math.floor(Math.random() * 255);
+			var b = Math.floor(Math.random() * 255);
+			var br = Math.floor(Math.random() * 255);
+			var bg = Math.floor(Math.random() * 255);
+			var bb = Math.floor(Math.random() * 255);
+			var c = Math.floor(Math.random() * chars.length);
+			return new ut.Tile(chars[c], r, g, b, br, bg, bb);
+		}
+	</script> 
+</head>
+
+<body onload="init(101, 41); start();">
+
+	<p id="result" class="centerer">Test running...</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer">
+		<p>Renderer: <span id="renderer"></span></p>
+		<a href="#" id="switch-renderer">Switch</a>
+	</div>
+
+	<a class="backlink" href="index.html">&lt;-- Back</a>
+
+</body>
+</html>
