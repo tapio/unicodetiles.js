@@ -19,11 +19,11 @@ ut.WebGLRenderer = function(view) {
 	this.defaultColors = { r: 1.0, g: 1.0, b: 1.0, br: 0.0, bg: 0.0, bb: 0.0 };
 
 	this.attribs = {
-		position: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
-		texCoord: { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
-		color:    { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
-		bgColor:  { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
-		char:     { buffer: null, data: null, itemSize: 1, location: null, hint: gl.DYNAMIC_DRAW }
+		position:  { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
+		texCoord:  { buffer: null, data: null, itemSize: 2, location: null, hint: gl.STATIC_DRAW },
+		color:     { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
+		bgColor:   { buffer: null, data: null, itemSize: 3, location: null, hint: gl.DYNAMIC_DRAW },
+		charIndex: { buffer: null, data: null, itemSize: 1, location: null, hint: gl.DYNAMIC_DRAW }
 	};
 
 	function insertQuad(arr, i, x, y, w, h) {
@@ -113,11 +113,11 @@ ut.WebGLRenderer = function(view) {
 	gl.useProgram(program);
 
 	// Get attribute locations
-	this.attribs.position.location = gl.getAttribLocation(program, "position");
-	this.attribs.texCoord.location = gl.getAttribLocation(program, "texCoord");
-	this.attribs.color.location    = gl.getAttribLocation(program, "color");
-	this.attribs.bgColor.location  = gl.getAttribLocation(program, "bgColor");
-	this.attribs.char.location     = gl.getAttribLocation(program, "charIndex");
+	this.attribs.position.location  = gl.getAttribLocation(program, "position");
+	this.attribs.texCoord.location  = gl.getAttribLocation(program, "texCoord");
+	this.attribs.color.location     = gl.getAttribLocation(program, "color");
+	this.attribs.bgColor.location   = gl.getAttribLocation(program, "bgColor");
+	this.attribs.charIndex.location = gl.getAttribLocation(program, "charIndex");
 
 	// Setup buffers and uniforms
 	this.initBuffers();
@@ -232,7 +232,7 @@ ut.WebGLRenderer.prototype.render = function() {
 				ch = this.charMap[tile.ch];
 			}
 			var k = attribs.color.itemSize * 6 * (j * w + i);
-			var kk = attribs.char.itemSize * 6 * (j * w + i);
+			var kk = attribs.charIndex.itemSize * 6 * (j * w + i);
 			var r = tile.r === undefined ? this.defaultColors.r : tile.r / 255;
 			var g = tile.g === undefined ? this.defaultColors.g : tile.g / 255;
 			var b = tile.b === undefined ? this.defaultColors.b : tile.b / 255;
@@ -247,7 +247,7 @@ ut.WebGLRenderer.prototype.render = function() {
 				attribs.bgColor.data[n+0] = br;
 				attribs.bgColor.data[n+1] = bg;
 				attribs.bgColor.data[n+2] = bb;
-				attribs.char.data[kk+m] = ch;
+				attribs.charIndex.data[kk+m] = ch;
 			}
 		}
 	}
@@ -257,8 +257,8 @@ ut.WebGLRenderer.prototype.render = function() {
 	gl.bufferData(gl.ARRAY_BUFFER, attribs.color.data, attribs.color.hint);
 	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.bgColor.buffer);
 	gl.bufferData(gl.ARRAY_BUFFER, attribs.bgColor.data, attribs.bgColor.hint);
-	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.char.buffer);
-	gl.bufferData(gl.ARRAY_BUFFER, attribs.char.data, attribs.char.hint);
+	gl.bindBuffer(gl.ARRAY_BUFFER, attribs.charIndex.buffer);
+	gl.bufferData(gl.ARRAY_BUFFER, attribs.charIndex.data, attribs.charIndex.hint);
 
 	var attrib = this.attribs.position;
 	gl.drawArrays(gl.TRIANGLES, 0, attrib.data.length / attrib.itemSize);
