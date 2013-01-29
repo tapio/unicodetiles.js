@@ -39,8 +39,8 @@ ut.CanvasRenderer.prototype.render = function() {
 	var tile, ch, fg, bg, x, y;
 	var view = this.view, buffer = this.view.buffer;
 	var w = view.w, h = view.h;
-	var hth = (0.5*this.th)|0;
-	var hgap = (0.5*this.gap); // Squarification
+	var hth = (0.5 * this.th)|0;
+	var hgap = 0.5 * this.gap; // Squarification
 	// Clearing with one big rect is much faster than with individual char rects
 	this.ctx.fillStyle = view.defaultBackground;
 	this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);

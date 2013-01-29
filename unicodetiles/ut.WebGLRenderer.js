@@ -50,7 +50,7 @@ ut.WebGLRenderer = function(view) {
 				// Position & texCoords
 				var k = attribs.position.itemSize * 6 * (j * w + i);
 				insertQuad(attribs.position.data, k, i * this.tw, j * this.th, this.tw, this.th);
-				insertQuad(attribs.texCoord.data, k, 0.0, 0.0, 1 / w, 1 / h);
+				insertQuad(attribs.texCoord.data, k, 0.0, 0.0, 1.0, 1.0);
 			}
 		}
 		// Upload
@@ -151,11 +151,11 @@ ut.WebGLRenderer.prototype.buildTexture = function() {
 	}
 
 	var c = 0, ch;
-	var hgap = (0.5*this.gap); // Squarification
+	var hgap = 0.5 * this.gap; // Squarification
 	this.ctx.fillStyle = "#000000";
 	this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
 	this.ctx.fillStyle = "#ffffff";
-	var y = (0.5*this.th)|0; // Half because textBaseline is middle
+	var y = 0.5 * this.th; // Half because textBaseline is middle
 	for (var j = 0; j < h; ++j) {
 		var x = 0;
 		for (var i = 0; i < w; ++i, ++c) {
@@ -279,7 +279,7 @@ ut.WebGLRenderer.VERTEX_SHADER = [
 
 	"void main() {",
 		"vec2 tileCoords = floor(vec2(mod(charIndex, uTileCounts.x), charIndex / uTileCounts.x));",
-		"vTexCoord = texCoord + tileCoords / uTileCounts;",
+		"vTexCoord = (texCoord + tileCoords) / uTileCounts;",
 		"vColor = color;",
 		"vBgColor = bgColor;",
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
