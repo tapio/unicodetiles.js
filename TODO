@@ -1,8 +1,15 @@
 General:
+	* Make separate files for renderers, possibly others too
 Engine:
+	* Investigate if shader callback should be removed
+	* Investigate if tile cache usage could be simplified to use only one code path
 Input:
 	* Key repeat broken on Opera (does not honor the delay)
 Viewport:
 	* setDefaultColor, setDefaultBackground
 		-> CSS from the parent as is now?
+WebGLRenderer:
+	* Auto character caching
+	* Test Opera
+	* Test falling back
 
