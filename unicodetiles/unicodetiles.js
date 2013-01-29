@@ -362,21 +362,20 @@ ut.WebGLRenderer = function(view) {
 	};
 
 	this.buildTexture = function() {
-		var c = 0, ch, x, y;
+		var c = 0, ch;
 		var w = view.w, h = view.h;
-		var hth = (0.5*this.th)|0;
 		var hgap = (0.5*this.gap); // Squarification
 		this.ctx.fillStyle = "#000000";
 		this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
 		this.ctx.fillStyle = "#ffffff";
-		y = hth; // half because textBaseline is middle
+		var y = (0.5*this.th)|0; // Half because textBaseline is middle
 		for (var j = 0; j < h; ++j) {
-			x = 0;
+			var x = 0;
 			for (var i = 0; i < w; ++i, ++c) {
 				ch = this.charArray[c];
 				if (!ch) break;
 				this.ctx.fillText(ch, x + hgap, y);
-				x += this.tw + this.gap;
+				x += this.tw;
 			}
 			if (!ch) break;
 			y += this.th;
@@ -412,7 +411,8 @@ ut.WebGLRenderer = function(view) {
 		this.ctx.fillStyle = "#ffffff";
 		this.tw = this.ctx.measureText("M").width;
 		this.th = parseInt(s.fontSize, 10);
-		this.gap = view.squarify ? (this.th - this.tw) : 0;
+		this.gap = this.view.squarify ? (this.th - this.tw) : 0;
+		if (this.view.squarify) this.tw = this.th;
 		var color = s.color.match(/\d+/g);
 		var bgColor = s.backgroundColor.match(/\d+/g);
 		this.defaultColors.r = parseInt(color[0], 10) / 255;
