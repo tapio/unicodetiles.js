@@ -8,6 +8,7 @@ You might also be interested to know that a third-party [Ruby port of this libra
 
 Current features
 ----------------
+
 * Viewport - _character grid display_
 	- Three rendering engines: WebGL, 2d canvas and slow DOM
 	- Automatically picks the best renderer supported by user's browser
@@ -61,6 +62,21 @@ Tests
 
 There are some, mostly performance related tests/benchmarks that you can run in the tests-subdirectory:
 [local link](tests/) | [online](http://tapio.github.com/unicodetiles.js/tests/)
+
+
+Version history
+---------------
+
+* v2.0
+	- WebGLRenderer
+	- Renderers in their own files
+	- More test cases
+* v1.1
+	- Transition effects
+	- Native app based on QtWebkit
+* v1.0
+	- Initial release
+
 
 License
 -------
