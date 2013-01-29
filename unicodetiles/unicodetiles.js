@@ -600,13 +600,13 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 	this.setRenderer = function(newrenderer) {
 		this.elem.innerHTML = "";
 		if (newrenderer === "auto" || newrenderer === "webgl") {
-			//try {
+			try {
 				this.renderer = new ut.WebGLRenderer(this);
-			//} catch (e) {
-			//	console.log(e);
-			//	newrenderer = "canvas";
-			//	this.elem.innerHTML = "";
-			//}
+			} catch (e) {
+				console.log(e);
+				newrenderer = "canvas";
+				this.elem.innerHTML = "";
+			}
 		}
 		if (newrenderer === "canvas") {
 			try {
