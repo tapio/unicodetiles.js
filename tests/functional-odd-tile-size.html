@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Functional Tests</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="../examples/style.css" rel="stylesheet" type="text/css" />
+	<style>
+		#game { font-size: 17px; }
+	</style>
+	<script src="../unicodetiles/unicodetiles.js"></script>
+	<script src="../unicodetiles/ut.WebGLRenderer.js"></script>
+	<script src="../unicodetiles/ut.CanvasRenderer.js"></script>
+	<script src="../unicodetiles/ut.DOMRenderer.js"></script>
+	<script src="../examples/renderer-switcher.js"></script>
+	<script>
+		var term; // Can't be initialized yet because DOM is not ready
+
+		function start() {
+			var w = 50, h = 26;
+			term = new ut.Viewport(document.getElementById("game"), w, h);
+			term.clear();
+			for (var j = 0; j < h; ++j) {
+				for (var i = 0; i < w; ++i) {
+					var c = 33 + (j * w + i) % 94;
+					var ch = String.fromCharCode(c);
+					if (Math.random() > 0.2) ch = "▒";
+					var tile = new ut.Tile(ch, (Math.random()*255)|0, (Math.random()*255)|0, (Math.random()*255)|0);
+					term.put(tile, i, j);
+				}
+			}
+			term.render();
+		}
+
+	</script>
+</head>
+
+<body onload="start(); createRendererSwitcher();"><div id="container">
+
+	<p class="centerer">Tests rendering with odd (not even pixel amount) tilesize.</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
+
+	<a class="backlink" href="index.html">&lt;-- Back to index</a>
+
+</div></body>
+</html>

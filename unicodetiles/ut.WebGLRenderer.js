@@ -160,7 +160,7 @@ ut.WebGLRenderer.prototype.buildTexture = function() {
 		var x = 0;
 		for (var i = 0; i < w; ++i, ++c) {
 			ch = this.charArray[c];
-			if (!ch) break;
+			if (ch === undefined) break;
 			this.ctx.fillText(ch, x + hgap, y);
 			x += this.tw;
 		}
