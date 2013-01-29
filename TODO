@@ -10,8 +10,8 @@ Viewport:
 	* setDefaultColor, setDefaultBackground
 		-> CSS from the parent as is now?
 WebGLRenderer:
-	* Fix horizontal gaps
-	* Test Opera
+	* Fix vertical gaps
+	* Fix running out of cache texture space
 	* Test falling back
 Examples:
 	* More GC friendliness
@@ -19,8 +19,5 @@ Examples:
 	* DOMRenderer tile CSS styling (border-radius, drop-shadow etc...)
 Tests:
 	* More GC friendliness
-	* functional-01-all-examples
-	* functional-02-lots-of-unicode
 	* functional-03-inheriting-css-colors
-	* performance-04-huge-viewport
 
