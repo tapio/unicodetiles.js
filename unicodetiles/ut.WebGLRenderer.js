@@ -123,24 +123,34 @@ ut.WebGLRenderer = function(view) {
 	this.initBuffers();
 	var resolutionLocation = gl.getUniformLocation(program, "uResolution");
 	gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
-	var tileCountsLocation = gl.getUniformLocation(program, "uTileCounts");
-	gl.uniform2f(tileCountsLocation, this.view.w, this.view.h);
+	this.tileCountsLocation = gl.getUniformLocation(program, "uTileCounts");
+	gl.uniform2f(this.tileCountsLocation, this.view.w, this.view.h);
 
 	// Setup texture
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
 	var texture = gl.createTexture();
 	gl.bindTexture(gl.TEXTURE_2D, texture);
 	this.cacheChars(" !\"#$%&'()*+,-./0123456789:;<=>?@ABCDEFGHIJKLMNOPQRSTUVWXYZ[\\]^_`abcdefghijklmnopqrstuvwxyz{|}~");
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.LINEAR);
-	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MAG_FILTER, gl.NEAREST);
+	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
 };
 
 ut.WebGLRenderer.prototype.buildTexture = function() {
+	var gl = this.gl;
+	var w = this.offscreen.width / this.tw, h = this.offscreen.height / this.th;
+	// Check if need to resize the canvas
+	var charCount = this.charArray.length;
+	if (charCount > w * h) {
+		h = Math.ceil(charCount / w) + 1; // Allocate some extra space too
+		this.offscreen.height = h * this.th;
+		this.updateStyle();
+		gl.uniform2f(this.tileCountsLocation, w, h);
+	}
+
 	var c = 0, ch;
-	var w = this.view.w, h = this.view.h;
 	var hgap = (0.5*this.gap); // Squarification
 	this.ctx.fillStyle = "#000000";
 	this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
@@ -157,7 +167,6 @@ ut.WebGLRenderer.prototype.buildTexture = function() {
 		if (!ch) break;
 		y += this.th;
 	}
-	var gl = this.gl;
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 };
 
