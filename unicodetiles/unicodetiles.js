@@ -5,6 +5,8 @@
 
 /*jshint browser:true devel:true trailing:true latedef:true undef:true unused:true newcap:true */
 
+if (!window.console) { window.console = {}; window.console.log = function(){}; }
+
 /// Namespace: ut
 /// Container namespace.
 var ut = ut || {};
