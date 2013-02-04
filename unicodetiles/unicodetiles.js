@@ -341,6 +341,7 @@ ut.Engine = function(vp, func, w, h) {
 	///   effect - (string) (optional) name of effect to use (see above for legal values)
 	///   duration - (integer) (optional) how many milliseconds the transition effect should last
 	ut.Engine.prototype.setTileFunc = function(func, effect, duration) {
+		"use strict";
 		if (effect) {
 			this.transition = undefined;
 			if (typeof effect === "string") {
@@ -436,6 +437,7 @@ ut.Engine = function(vp, func, w, h) {
 	///   x - (integer) viewport center x coordinate in the tile world
 	///   y - (integer) viewport center y coordinate in the tile world
 	ut.Engine.prototype.update = function(x, y) {
+		"use strict";
 		x = x || 0;
 		y = y || 0;
 		// World coords of upper left corner of the viewport

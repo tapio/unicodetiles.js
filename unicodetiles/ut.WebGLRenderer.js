@@ -141,6 +141,7 @@ ut.WebGLRenderer = function(view) {
 };
 
 ut.WebGLRenderer.prototype.buildTexture = function() {
+	"use strict";
 	var gl = this.gl;
 	var w = this.offscreen.width / this.tw, h = this.offscreen.height / this.th;
 	// Check if need to resize the canvas
@@ -173,6 +174,7 @@ ut.WebGLRenderer.prototype.buildTexture = function() {
 };
 
 ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
+	"use strict";
 	if (!this.gl) return; // Nothing to do if not using WebGL renderer
 	var changed = false;
 	for (var i = 0; i < chars.length; ++i) {
@@ -187,6 +189,7 @@ ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
 };
 
 ut.WebGLRenderer.prototype.updateStyle = function(s) {
+	"use strict";
 	s = s || window.getComputedStyle(this.view.elem, null);
 	this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 	this.ctx.textBaseline = "middle";
@@ -208,6 +211,7 @@ ut.WebGLRenderer.prototype.updateStyle = function(s) {
 ut.WebGLRenderer.prototype.clear = function() { /* No op */ };
 
 ut.WebGLRenderer.prototype.render = function() {
+	"use strict";
 	var gl = this.gl;
 	gl.clear(gl.COLOR_BUFFER_BIT);
 	var attribs = this.attribs;

@@ -3,7 +3,5 @@
 	"browser": true,
 	"newcap": true,
 	"undef": false,
-	"trailing": true,
-	"strict": false,
-	"globalstrict": true
+	"trailing": true
 }

@@ -26,6 +26,7 @@ ut.CanvasRenderer = function(view) {
 };
 
 ut.CanvasRenderer.prototype.updateStyle = function(s) {
+	"use strict";
 	s = s || window.getComputedStyle(this.view.elem, null);
 	this.ctx.font = s.fontSize + "/" + s.lineHeight + " " + s.fontFamily;
 	this.ctx.textBaseline = "middle";
@@ -38,6 +39,7 @@ ut.CanvasRenderer.prototype.updateStyle = function(s) {
 ut.CanvasRenderer.prototype.clear = function() { /* No op */ };
 
 ut.CanvasRenderer.prototype.render = function() {
+	"use strict";
 	var tile, ch, fg, bg, x, y;
 	var view = this.view, buffer = this.view.buffer;
 	var w = view.w, h = view.h;

@@ -27,6 +27,7 @@ ut.DOMRenderer = function(view) {
 };
 
 ut.DOMRenderer.prototype.updateStyle = function(s) {
+	"use strict";
 	s = window.getComputedStyle(this.spans[0][0], null);
 	this.tw = parseInt(s.width, 10);
 	if (this.tw === 0 || isNaN(this.tw)) return; // Nothing to do, exit
@@ -41,6 +42,7 @@ ut.DOMRenderer.prototype.updateStyle = function(s) {
 };
 
 ut.DOMRenderer.prototype.clear = function() {
+	"use strict";
 	for (var j = 0; j < this.view.h; ++j) {
 		for (var i = 0; i < this.view.w; ++i) {
 			this.colors[j][i] = "";
@@ -49,6 +51,7 @@ ut.DOMRenderer.prototype.clear = function() {
 };
 
 ut.DOMRenderer.prototype.render = function() {
+	"use strict";
 	var w = this.view.w, h = this.view.h;
 	var buffer = this.view.buffer;
 	var defaultColor = this.view.defaultColor;
