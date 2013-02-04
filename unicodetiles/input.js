@@ -177,7 +177,7 @@ ut.isKeyPressed = function(key) {
 };
 
 /// Function: setKeyRepeatInterval
-/// Sets the interval when user's onKeyDown handler is called when a key is held down. 
+/// Sets the interval when user's onKeyDown handler is called when a key is held down.
 /// <ut.initInput> must be called with a handler for this to work.
 ///
 /// Parameters:

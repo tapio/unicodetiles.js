@@ -16,7 +16,7 @@ var ut = ut || {};
 /// NULLCHAR - Character used when none is specified otherwise.
 /// CSSCLASS - The CSS class name used for the tile engine element.
 /// NULLTILE - The tile used as placeholder for empty tile.
-ut.VERSION = "2.0";
+ut.VERSION = "2.1dev";
 ut.NULLCHAR = " ";
 ut.CSSCLASS = "unicodetiles";
 ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
@@ -360,14 +360,12 @@ ut.Engine = function(vp, func, w, h) {
 				else if (effect === "circlein") this.transition = function(x, y, w, h, new_t, old_t, factor) {
 					var halfw = w * 0.5, halfh = h * 0.5;
 					x -= halfw; y -= halfh;
-					var dx = x - halfw, dy = y - halfh;
 					if (x*x + y*y < (halfw*halfw + halfh*halfh) * factor) return new_t;
 					else return old_t;
 				};
 				else if (effect === "circleout") this.transition = function(x, y, w, h, new_t, old_t, factor) {
 					var halfw = w * 0.5, halfh = h * 0.5;
 					x -= halfw; y -= halfh;
-					var dx = x - halfw, dy = y - halfh;
 					factor = 1.0 - factor;
 					if (x*x + y*y > (halfw*halfw + halfh*halfh) * factor) return new_t;
 					else return old_t;
