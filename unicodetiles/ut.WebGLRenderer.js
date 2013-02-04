@@ -78,8 +78,8 @@ ut.WebGLRenderer = function(view) {
 	this.updateStyle();
 	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
 	this.canvas.height = this.th * view.h;
-	this.offscreen.width = this.canvas.width;
-	this.offscreen.height = this.canvas.height;
+	this.offscreen.width = 0;
+	this.offscreen.height = 0;
 	// Doing this again since setting canvas w/h resets the state
 	this.updateStyle();
 
@@ -127,6 +127,8 @@ ut.WebGLRenderer = function(view) {
 	gl.uniform2f(resolutionLocation, this.canvas.width, this.canvas.height);
 	this.tileCountsLocation = gl.getUniformLocation(program, "uTileCounts");
 	gl.uniform2f(this.tileCountsLocation, this.view.w, this.view.h);
+	this.paddingLocation = gl.getUniformLocation(program, "uPadding");
+	gl.uniform2f(this.paddingLocation, 0.0, 0.0);
 
 	// Setup texture
 	//view.elem.appendChild(this.offscreen); // Debug offscreen
@@ -140,39 +142,50 @@ ut.WebGLRenderer = function(view) {
 	gl.activeTexture(gl.TEXTURE0);
 };
 
+
+/////////////////
+// Build texture
 ut.WebGLRenderer.prototype.buildTexture = function() {
 	"use strict";
 	var gl = this.gl;
-	var w = this.offscreen.width / this.tw, h = this.offscreen.height / this.th;
+	var w = this.offscreen.width / (this.tw + this.pad), h = this.offscreen.height / (this.th + this.pad);
 	// Check if need to resize the canvas
 	var charCount = this.charArray.length;
-	if (charCount > w * h) {
-		h = Math.ceil(charCount / w) + 1; // Allocate some extra space too
-		this.offscreen.height = h * this.th;
+	if (charCount > Math.floor(w) * Math.floor(h)) {
+		w = Math.ceil(Math.sqrt(charCount));
+		h = w + 2; // Allocate some extra space too
+		this.offscreen.width = w * (this.tw + this.pad);
+		this.offscreen.height = h * (this.th + this.pad);
 		this.updateStyle();
 		gl.uniform2f(this.tileCountsLocation, w, h);
 	}
+	gl.uniform2f(this.paddingLocation, this.pad / this.offscreen.width, this.pad / this.offscreen.height);
 
 	var c = 0, ch;
-	var hgap = 0.5 * this.gap; // Squarification
+	var halfGap = 0.5 * this.gap; // Squarification
 	this.ctx.fillStyle = "#000000";
 	this.ctx.fillRect(0, 0, this.offscreen.width, this.offscreen.height);
 	this.ctx.fillStyle = "#ffffff";
-	var y = 0.5 * this.th; // Half because textBaseline is middle
+	var tw = this.tw + this.pad;
+	var th = this.th + this.pad;
+	var y = 0.5 * th; // Half because textBaseline is middle
 	for (var j = 0; j < h; ++j) {
-		var x = 0;
+		var x = this.pad * 0.5;
 		for (var i = 0; i < w; ++i, ++c) {
 			ch = this.charArray[c];
 			if (ch === undefined) break;
-			this.ctx.fillText(ch, x + hgap, y);
-			x += this.tw;
+			this.ctx.fillText(ch, x + halfGap, y);
+			x += tw;
 		}
 		if (!ch) break;
-		y += this.th;
+		y += th;
 	}
 	gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGBA, gl.RGBA, gl.UNSIGNED_BYTE, this.offscreen);
 };
 
+
+///////////////
+// Cache chars
 ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
 	"use strict";
 	if (!this.gl) return; // Nothing to do if not using WebGL renderer
@@ -188,6 +201,9 @@ ut.WebGLRenderer.prototype.cacheChars = function(chars, build) {
 	if (changed && build !== false) this.buildTexture();
 };
 
+
+////////////////
+// Update style
 ut.WebGLRenderer.prototype.updateStyle = function(s) {
 	"use strict";
 	s = s || window.getComputedStyle(this.view.elem, null);
@@ -198,6 +214,7 @@ ut.WebGLRenderer.prototype.updateStyle = function(s) {
 	this.th = parseInt(s.fontSize, 10);
 	this.gap = this.view.squarify ? (this.th - this.tw) : 0;
 	if (this.view.squarify) this.tw = this.th;
+	this.pad = Math.ceil(this.th * 0.2);
 	var color = s.color.match(/\d+/g);
 	var bgColor = s.backgroundColor.match(/\d+/g);
 	this.defaultColors.r = parseInt(color[0], 10) / 255;
@@ -210,6 +227,9 @@ ut.WebGLRenderer.prototype.updateStyle = function(s) {
 
 ut.WebGLRenderer.prototype.clear = function() { /* No op */ };
 
+
+//////////
+// Render
 ut.WebGLRenderer.prototype.render = function() {
 	"use strict";
 	var gl = this.gl;
@@ -272,6 +292,7 @@ ut.WebGLRenderer.VERTEX_SHADER = [
 	"attribute float charIndex;",
 	"uniform vec2 uResolution;",
 	"uniform vec2 uTileCounts;",
+	"uniform vec2 uPadding;",
 	"varying vec2 vTexCoord;",
 	"varying vec3 vColor;",
 	"varying vec3 vBgColor;",
@@ -279,6 +300,7 @@ ut.WebGLRenderer.VERTEX_SHADER = [
 	"void main() {",
 		"vec2 tileCoords = floor(vec2(mod(charIndex, uTileCounts.x), charIndex / uTileCounts.x));",
 		"vTexCoord = (texCoord + tileCoords) / uTileCounts;",
+		"vTexCoord += (0.5 - texCoord) * uPadding;",
 		"vColor = color;",
 		"vBgColor = bgColor;",
 		"vec2 pos = position / uResolution * 2.0 - 1.0;",
