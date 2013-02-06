@@ -16,7 +16,7 @@ var ut = ut || {};
 /// NULLCHAR - Character used when none is specified otherwise.
 /// CSSCLASS - The CSS class name used for the tile engine element.
 /// NULLTILE - The tile used as placeholder for empty tile.
-ut.VERSION = "2.1dev";
+ut.VERSION = "2.1";
 ut.NULLCHAR = " ";
 ut.CSSCLASS = "unicodetiles";
 ut.NULLTILE = {}; // Initialized properly after ut.Tile is defined
