@@ -150,8 +150,12 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 
 	// Create two 2-dimensional array to hold the viewport tiles
 	this.buffer = new Array(h);
-	for (var j = 0; j < h; ++j)
+	for (var j = 0; j < h; ++j) {
 		this.buffer[j] = new Array(w);
+		for (var i = 0; i < w; ++i) {
+			this.buffer[j][i] = new ut.Tile();
+		}
+	}
 
 	/// Function: updateStyle
 	/// If the style of the parent element is modified, this needs to be called.
