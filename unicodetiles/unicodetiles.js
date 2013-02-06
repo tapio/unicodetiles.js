@@ -109,8 +109,15 @@ ut.Tile = function(ch, r, g, b, br, bg, bb) {
 			return { "r": this.br, "g": this.bg, "b": this.bb };
 		else return {};
 	};
+	/// Function: copy
+	/// Makes this tile identical to the one supplied. Custom properties are not copied.
+	ut.Tile.prototype.copy = function(other) {
+		this.ch = other.ch;
+		this.r = other.r; this.g = other.g; this.b = other.b;
+		this.br = other.br; this.bg = other.bg; this.bb = other.bb;
+	};
 	/// Function: clone
-	/// Returns a new copy of this tile
+	/// Returns a new copy of this tile. Custom properties are not cloned.
 	ut.Tile.prototype.clone = function() {
 		return new ut.Tile(this.ch, this.r, this.g, this.b, this.br, this.bg, this.bb);
 	};
