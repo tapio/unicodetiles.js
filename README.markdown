@@ -67,6 +67,10 @@ There are some, mostly performance related tests/benchmarks that you can run in 
 Version history
 ---------------
 
+* v2.1
+	- Improved chracter texture generation for WebGLRenderer
+	- Small Viewport and Tile improvements
+	- New example: 08-raycaster
 * v2.0
 	- WebGLRenderer
 	- Renderers in their own files
