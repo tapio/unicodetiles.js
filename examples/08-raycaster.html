@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+	<title>Raycaster</title>
+	<link href="../unicodetiles/unicodetiles.css" rel="stylesheet" type="text/css" />
+	<link href="../docs/style.css" rel="stylesheet" type="text/css" />
+	<link href="style.css" rel="stylesheet" type="text/css" />
+	<style>
+		/* Smaller "pixel" size */
+		#game { font-size: 8px; }
+	</style>
+	<script src="../unicodetiles/unicodetiles.js"></script>
+	<script src="../unicodetiles/ut.WebGLRenderer.js"></script>
+	<script src="../unicodetiles/ut.CanvasRenderer.js"></script>
+	<script src="../unicodetiles/ut.DOMRenderer.js"></script>
+	<script src="../unicodetiles/input.js"></script>
+	<script src="renderer-switcher.js"></script>
+	<script>
+
+		var term;
+		var pl = { x: 3, y: 2, ang: 0 }; // Player
+		var FOV = Math.PI / 6;
+		var STEP = 0.1;
+		var SKY = new ut.Tile(" ", 0, 0, 0, 128, 128, 255);
+		var GROUND = new ut.Tile(".", 32, 24, 24, 64, 48, 0);
+		var WALL = new ut.Tile("|", 64, 64, 64, 128, 128, 128);
+		var map = [
+			" #####     #############      ",
+			" #...#######...........####   ",
+			" #...........#######......#   ",
+			" #...######..#     #..###.#   ",
+			" #####    #..#     ######.####",
+			"          #..# ####### #.....#",
+			"          #..# #.....# #.....#",
+			"          #..###.....###.....#",
+			"          #..................#",
+			"          ####.#########.#####",
+			"##########   #.#     #....#   ",
+			"#........##  #.#     #.#..#   ",
+			"#..####...#  #.#     #.#..#   ",
+			"#.........####.#######.###### ",
+			"#...........................# ",
+			"############################# "
+		];
+
+		function shade(tile, factor) {
+			tile.r = Math.floor(tile.r * factor);
+			tile.g = Math.floor(tile.g * factor);
+			tile.b = Math.floor(tile.b * factor);
+			tile.br = Math.floor(tile.br * factor);
+			tile.bg = Math.floor(tile.bg * factor);
+			tile.bb = Math.floor(tile.bb * factor);
+		}
+
+		function renderRaycaster() {
+			var i, j, tile;
+			/// Fill background
+			for (j = 0; j < term.h; ++j) {
+				for (i = 0; i < term.w; ++i) {
+					tile = term.buffer[j][i]
+					if (j < term.h / 2) tile.copy(SKY);
+					else {
+						tile.copy(GROUND);
+						shade(tile, j / term.h - 0.25);
+					}
+				}
+			}
+			/// Cast rays
+			var drawx = 0;
+			for (var a = pl.ang + FOV; a >= pl.ang - FOV && drawx < term.w; a -= 2.0 * FOV / term.w) {
+				var xx = pl.x;
+				var yy = pl.y;
+				var l = 0;
+				do {
+					xx += Math.cos(a) * STEP;
+					yy += Math.sin(a) * STEP;
+					l += STEP;
+				} while (map[yy|0][xx|0] === '.');
+				var height = term.h / l;
+				if (height > term.h) height = term.h;
+				for (j = term.h/2 - height/2; j < term.h/2 + height/2; ++j) {
+					tile = term.buffer[j|0][drawx];
+					tile.copy(WALL);
+					shade(tile, height / term.h);
+				}
+				++drawx;
+			}
+			term.render();
+		}
+
+		// Key press handler - movement & collision handling
+		function onKeyDownRaycaster(k) {
+			var speed = 0;
+			if (k === ut.KEY_LEFT || k === ut.KEY_H) pl.ang += Math.PI/16;
+			else if (k === ut.KEY_RIGHT || k === ut.KEY_L) pl.ang -= Math.PI/16;
+			else if (k === ut.KEY_UP || k === ut.KEY_K) speed = 0.5;
+			else if (k === ut.KEY_DOWN || k === ut.KEY_J) speed = -0.5;
+			if (speed === 0) return;
+			var oldx = pl.x, oldy = pl.y;
+			pl.x += Math.cos(pl.ang) * speed;
+			pl.y += Math.sin(pl.ang) * speed;
+			if (map[pl.y|0][pl.x|0] !== '.') { pl.x = oldx; pl.y = oldy; }
+			renderRaycaster();
+		}
+
+		function initRaycaster() {
+			window.setInterval(renderRaycaster, 50);
+			// Create new viewport with squarify enabled
+			term = new ut.Viewport(document.getElementById("game"), 50, 40, "auto", true);
+			// Initialize input
+			ut.initInput(onKeyDownRaycaster);
+		}
+	</script>
+</head>
+
+<body onload="initRaycaster(); createRendererSwitcher();">
+
+	<p class="centerer">Move around with arrow keys.</p>
+
+	<div class="centerer">
+		<div id="game">Enable JavaScript and reload the page.</div>
+	</div>
+
+	<div class="centerer" id="renderer-switcher">
+		<!-- Populated by renderer-switcher.js -->
+	</div>
+
+	<a class="backlink" href="index.html">&lt;-- Back to index</a>
+
+</body>
+</html>
