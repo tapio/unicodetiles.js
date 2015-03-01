@@ -74,6 +74,7 @@ ut.WebGLRenderer = function(view) {
 	this.offscreen.style.top = "0px";
 	this.offscreen.style.left = "0px";
 	this.ctx = this.offscreen.getContext("2d");
+	if (!this.ctx) throw "Failed to acquire offscreen canvas drawing context";
 	// WebGL drawing canvas
 	this.updateStyle();
 	this.canvas.width = (view.squarify ? this.th : this.tw) * view.w;
