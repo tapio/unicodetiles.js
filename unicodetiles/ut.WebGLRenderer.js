@@ -141,6 +141,9 @@ ut.WebGLRenderer = function(view) {
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_S, gl.CLAMP_TO_EDGE);
 	gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_WRAP_T, gl.CLAMP_TO_EDGE);
 	gl.activeTexture(gl.TEXTURE0);
+
+	var _this = this;
+	setTimeout(function() { _this.updateStyle(); _this.buildTexture(); _this.render(); }, 100);
 };
 
 
