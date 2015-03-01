@@ -5,7 +5,9 @@
 
 /*jshint browser:true devel:true trailing:true latedef:true undef:true unused:true newcap:true */
 
-if (!window.console) { window.console = {}; window.console.log = function(){}; }
+if (!window.console) {
+	window.console = { log: function(){}, warn: function(){}, error: function(){} }
+}
 
 /// Namespace: ut
 /// Container namespace.
@@ -187,7 +189,7 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 			try {
 				this.renderer = new ut.WebGLRenderer(this);
 			} catch (e) {
-				console.log(e);
+				console.error(e);
 				newrenderer = "canvas";
 				this.elem.innerHTML = "";
 			}
@@ -196,7 +198,7 @@ ut.Viewport = function(elem, w, h, renderer, squarify) {
 			try {
 				this.renderer = new ut.CanvasRenderer(this);
 			} catch (e) {
-				console.log(e);
+				console.error(e);
 				newrenderer = "dom";
 				this.elem.innerHTML = "";
 			}
