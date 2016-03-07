@@ -1,0 +1,24 @@
+{
+  "name": "unicodetiles.js",
+  "version": "2.1.0",
+  "description": "UnicodeTiles.js, a library providing a text character based tile engine for creating roguelike games.",
+  "main": "unicodetiles/unicodetiles.js",
+  "directories": {
+    "doc": "docs",
+    "example": "examples",
+    "test": "tests"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tapio/unicodetiles.js.git"
+  },
+  "author": "Tapio Vierros",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/tapio/unicodetiles.js/issues"
+  },
+  "homepage": "http://tapiov.net/unicodetiles.js/"
+}
